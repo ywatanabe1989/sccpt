@@ -1,5 +1,14 @@
 # Makefile for sccpt package
 
+# Use Python from virtual environment if activated, otherwise use python3
+ifdef VIRTUAL_ENV
+    PYTHON := $(VIRTUAL_ENV)/bin/python
+    PIP := $(VIRTUAL_ENV)/bin/pip
+else
+    PYTHON := python3
+    PIP := pip3
+endif
+
 .PHONY: help install test build upload upload-test clean
 
 help:
@@ -12,21 +21,21 @@ help:
 	@echo "  make clean        Remove build artifacts"
 
 install:
-	pip install -e .
+	$(PIP) install -e .
 
 test:
-	python test_sccpt.py
+	$(PYTHON) -m pytest tests/
 
 build: clean
-	python setup.py sdist bdist_wheel
+	$(PYTHON) setup.py sdist bdist_wheel
 
 upload-test: build
-	python -m twine upload --repository testpypi dist/*
+	$(PYTHON) -m twine upload --repository testpypi dist/*
 
 upload: build
 	@echo "⚠️  This will upload to PyPI. Continue? [y/N]"
 	@read ans && [ $${ans} = y ]
-	python -m twine upload dist/*
+	$(PYTHON) -m twine upload dist/*
 
 clean:
 	rm -rf build dist *.egg-info
