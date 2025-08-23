@@ -1,5 +1,5 @@
 <!-- ---
-!-- Timestamp: 2025-08-23 22:23:25
+!-- Timestamp: 2025-08-23 23:17:24
 !-- Author: ywatanabe
 !-- File: /home/ywatanabe/proj/sccpt/README.md
 !-- --- -->
@@ -9,38 +9,18 @@
 
 A lightweight, efficient screen capture library with automatic error detection. **Features full MCP (Model Context Protocol) server integration for seamless AI assistant workflows.** Optimized for WSL2 to capture Windows host screens.
 
-## Key Features
+## 🎬 Live Demos & Screenshots
 
-<details>
-<summary><strong>🤖 MCP Server Integration</strong></summary>
+### 📸 Single Screenshot Capture
+<img src="docs/screenshots/demo-single-capture.jpg" width="400" alt="Demo Screenshot">
 
-- **AI Assistant Ready** - Built-in MCP server for Claude Code and other AI assistants
-- **Direct Screenshot Control** - AI can capture, monitor, and analyze screenshots programmatically
-- **Automated Workflows** - Perfect for debugging, documentation, and monitoring tasks
-- **Real-time Interaction** - AI assistants can respond to visual changes instantly
+*Example of SCCPT's single screenshot capture functionality with custom message*
 
-</details>
+| Feature Demo | Description |
+|--------------|-------------|
+| <details><summary><strong>🔄 Real Monitoring Session</strong></summary><img src="docs/screenshots/monitoring-session-demo.gif" width="280" alt="Real Monitoring Demo"><br><em>Real GIF from actual monitoring session</em><br><br><strong>Session Details:</strong><br>• 30s monitoring interval<br>• 11 automatic captures<br>• 2.8MB optimized GIF<br>• JPEG compression<br>• Timestamp-based naming</details> | <details><summary><strong>📋 Workflow Documentation</strong></summary><img src="docs/screenshots/workflow_demo.gif" width="280" alt="Workflow Demo"><br><em>Step-by-step process capture (230KB, 7 frames)</em><br><br><strong>Features:</strong><br>• Sequential capture<br>• Auto file organization<br>• Visual documentation<br>• Efficient compression</details> |
+| <details><summary><strong>🖥️ Continuous Monitoring</strong></summary><img src="docs/screenshots/monitoring_demo.gif" width="280" alt="Monitoring Demo"><br><em>Real-time progress tracking (429KB, 12 frames)</em><br><br><strong>Technical:</strong><br>• Real-time monitoring<br>• Progress visualization<br>• Frame compression<br>• Session management</details> | <details><summary><strong>🚨 Error Detection</strong></summary><img src="docs/screenshots/error_detection_demo.gif" width="280" alt="Error Detection Demo"><br><em>Context-aware categorization (322KB, 5 frames)</em><br><br><strong>Smart Features:</strong><br>• Error detection<br>• stdout/stderr tagging<br>• Exception integration<br>• Intelligent naming</details> |
 
-<details>
-<summary><strong>📸 Core Screen Capture</strong></summary>
-
-- 🖼️ **Windows Host Capture from WSL** - Seamlessly capture Windows desktop from WSL with DPI awareness
-- 🖥️ **Multi-Monitor Support** - Capture single monitor or all monitors combined
-- 🚨 **Automatic Error Detection** - Automatically categorizes screenshots when called in exception handlers
-- 🗜️ **JPEG Compression** - Reduce file sizes with configurable quality (~250KB JPEG vs ~2MB PNG)
-
-</details>
-
-<details>
-<summary><strong>🎬 Advanced Features</strong></summary>
-
-- ⏱️ **Continuous Monitoring** - Automatic captures at configurable intervals (WSL: ~1.5s minimum due to PowerShell overhead)  
-- 🎥 **GIF Summaries** - Create animated GIFs from monitoring sessions for easy sharing
-- 📝 **Smart Filenames** - Timestamps + normalized messages + category indicators
-- 🔄 **Thread-Safe** - Safe for concurrent operations
-- 🎯 **Minimal Logging** - Clean, single-line output per screenshot
-
-</details>
 
 ## Installation
 
@@ -62,26 +42,8 @@ sccpt.stop()                         # Stop monitoring
 sccpt.create_gif_from_latest_session()  # Create GIF summary
 ```
 
-### 🤖 MCP Server - AI Assistant Integration
-
-```bash
-# Start MCP server for Claude Code integration
-python -m mcp_server_sccpt
-```
-
-*For complete setup instructions and available tools, see [MCP Server Integration](#-mcp-server-integration) section below.*
-
-## Use Cases & Examples
-
-### 📸 **Essential Use Cases**
-- **Debug visually** - Capture before/after states during development  
-- **Monitor processes** - Continuous screenshots during long operations
-- **Document workflows** - Step-by-step visual documentation
-- **Error analysis** - Automatic error categorization and screenshots
-- **AI-powered automation** - Let AI assistants capture and analyze screens via MCP integration
-
 <details>
-<summary><strong>📋 Detailed Python Examples</strong></summary>
+<summary><strong>📋 Detailed Usages in Python</strong></summary>
 
 ### 🐛 Debug Your Code Visually
 
@@ -130,21 +92,6 @@ sccpt.create_gif_from_latest_session()
 # 📹 GIF created: ~/.cache/sccpt/20250823_104523_summary.gif
 ```
 
-</details>
-
-## Platform Support
-
-| Platform | Support | Notes |
-|----------|---------|-------|
-| **WSL → Windows** | ✅ Full | Primary focus - DPI-aware, multi-monitor |
-| Linux (X11) | ⚠️ Limited | Falls back to mss/scrot |
-| macOS | ⚠️ Limited | Requires mss library |
-| Windows Native | ❌ | Not implemented |
-| Linux (Wayland) | ❌ | Not supported |
-
-<details>
-<summary><strong>⚙️ Technical Details & Configuration</strong></summary>
-
 ## Configuration
 
 All configuration through function parameters - no config files needed!
@@ -181,21 +128,15 @@ Optional:
 
 </details>
 
-## 🤖 MCP Server Integration
-
-**Transform your AI workflows** - SCCPT's MCP server enables Claude and other AI assistants to capture, monitor, and analyze screenshots directly as part of their reasoning process.
-
-### AI-Powered Capabilities
-- **Seamless Integration** - AI assistants can capture screenshots on demand
-- **Automated Debugging** - AI captures error screens and analyzes issues  
-- **Documentation Generation** - AI creates visual step-by-step guides
-- **Intelligent Monitoring** - AI watches for visual changes and responds
-- **Error Analysis** - AI automatically categorizes and analyzes screenshots
-
 <details>
-<summary><strong>🔧 MCP Server Setup & Configuration</strong></summary>
+<summary><strong>🤖 MCP Server Integration</strong></summary>
 
-### Setup
+- **AI Assistant Ready** - Built-in MCP server for Claude Code and other AI assistants
+- **Direct Screenshot Control** - AI can capture, monitor, and analyze screenshots programmatically
+- **Automated Workflows** - Perfect for debugging, documentation, and monitoring tasks
+- **Real-time Interaction** - AI assistants can respond to visual changes instantly
+
+### Setup - Just Add JSON!
 
 ```json
 // Add to your Claude Code settings
@@ -227,17 +168,27 @@ Optional:
 
 </details>
 
-## 🎬 Live Demos & Screenshots
 
-### 📸 Single Screenshot Capture
-<img src="docs/screenshots/demo-single-capture.jpg" width="400" alt="Demo Screenshot">
+## Use Cases & Examples
 
-*Example of SCCPT's single screenshot capture functionality with custom message*
+### 📸 **Essential Use Cases**
+- **Debug visually** - Capture before/after states during development  
+- **Monitor processes** - Continuous screenshots during long operations
+- **Document workflows** - Step-by-step visual documentation
+- **Error analysis** - Automatic error categorization and screenshots
+- **AI-powered automation** - Let AI assistants capture and analyze screens via MCP integration
 
-| Feature Demo | Description |
-|--------------|-------------|
-| <details><summary><strong>🔄 Real Monitoring Session</strong></summary><img src="docs/screenshots/monitoring-session-demo.gif" width="280" alt="Real Monitoring Demo"><br><em>Real GIF from actual monitoring session</em><br><br><strong>Session Details:</strong><br>• 30s monitoring interval<br>• 11 automatic captures<br>• 2.8MB optimized GIF<br>• JPEG compression<br>• Timestamp-based naming</details> | <details><summary><strong>📋 Workflow Documentation</strong></summary><img src="docs/screenshots/workflow_demo.gif" width="280" alt="Workflow Demo"><br><em>Step-by-step process capture (230KB, 7 frames)</em><br><br><strong>Features:</strong><br>• Sequential capture<br>• Auto file organization<br>• Visual documentation<br>• Efficient compression</details> |
-| <details><summary><strong>🖥️ Continuous Monitoring</strong></summary><img src="docs/screenshots/monitoring_demo.gif" width="280" alt="Monitoring Demo"><br><em>Real-time progress tracking (429KB, 12 frames)</em><br><br><strong>Technical:</strong><br>• Real-time monitoring<br>• Progress visualization<br>• Frame compression<br>• Session management</details> | <details><summary><strong>🚨 Error Detection</strong></summary><img src="docs/screenshots/error_detection_demo.gif" width="280" alt="Error Detection Demo"><br><em>Context-aware categorization (322KB, 5 frames)</em><br><br><strong>Smart Features:</strong><br>• Error detection<br>• stdout/stderr tagging<br>• Exception integration<br>• Intelligent naming</details> |
+
+## Platform Support
+
+| Platform | Support | Notes |
+|----------|---------|-------|
+| **WSL → Windows** | ✅ Full | Primary focus - DPI-aware, multi-monitor |
+| Linux (X11) | ⚠️ Limited | Falls back to mss/scrot |
+| macOS | ⚠️ Limited | Requires mss library |
+| Windows Native | ❌ | Not implemented |
+| Linux (Wayland) | ❌ | Not supported |
+
 
 ## License
 
