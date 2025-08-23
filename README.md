@@ -11,24 +11,36 @@ A lightweight, efficient screen capture library with automatic error detection. 
 
 ## Key Features
 
-### 🤖 **MCP Server Integration** 
+<details>
+<summary><strong>🤖 MCP Server Integration</strong></summary>
+
 - **AI Assistant Ready** - Built-in MCP server for Claude Code and other AI assistants
 - **Direct Screenshot Control** - AI can capture, monitor, and analyze screenshots programmatically
 - **Automated Workflows** - Perfect for debugging, documentation, and monitoring tasks
 - **Real-time Interaction** - AI assistants can respond to visual changes instantly
 
-### 📸 **Core Screen Capture**
+</details>
+
+<details>
+<summary><strong>📸 Core Screen Capture</strong></summary>
+
 - 🖼️ **Windows Host Capture from WSL** - Seamlessly capture Windows desktop from WSL with DPI awareness
 - 🖥️ **Multi-Monitor Support** - Capture single monitor or all monitors combined
 - 🚨 **Automatic Error Detection** - Automatically categorizes screenshots when called in exception handlers
 - 🗜️ **JPEG Compression** - Reduce file sizes with configurable quality (~250KB JPEG vs ~2MB PNG)
 
-### 🎬 **Advanced Features**
+</details>
+
+<details>
+<summary><strong>🎬 Advanced Features</strong></summary>
+
 - ⏱️ **Continuous Monitoring** - Automatic captures at configurable intervals (WSL: ~1.5s minimum due to PowerShell overhead)  
 - 🎥 **GIF Summaries** - Create animated GIFs from monitoring sessions for easy sharing
 - 📝 **Smart Filenames** - Timestamps + normalized messages + category indicators
 - 🔄 **Thread-Safe** - Safe for concurrent operations
 - 🎯 **Minimal Logging** - Clean, single-line output per screenshot
+
+</details>
 
 ## Installation
 
@@ -218,36 +230,14 @@ Optional:
 ## 🎬 Live Demos & Screenshots
 
 ### 📸 Single Screenshot Capture
-![Demo Screenshot](docs/screenshots/demo-single-capture.jpg)
+<img src="docs/screenshots/demo-single-capture.jpg" width="400" alt="Demo Screenshot">
+
 *Example of SCCPT's single screenshot capture functionality with custom message*
 
-### 🔄 Real Monitoring Session
-![Real Monitoring Demo](docs/screenshots/monitoring-session-demo.gif)
-*Real GIF created from an actual monitoring session showing SCCPT's continuous capture capabilities*
-
-**Real Session Details:**
-- **Duration**: 30 seconds monitoring interval  
-- **Screenshots**: 11 captures automatically taken
-- **File Size**: 2.8MB optimized GIF
-- **Quality**: Automatic JPEG compression for efficient storage
-- **Features Demonstrated**: 
-  - Automatic timestamp-based naming
-  - Session-based organization
-  - GIF creation from monitoring sessions
-
-## 🎥 Professional Feature Demonstrations
-
-### 📋 Complete Workflow Documentation
-![Workflow Demo](docs/screenshots/workflow_demo.gif)
-*Step-by-step workflow documentation showing how SCCPT captures each stage of a process (230KB, 7 frames)*
-
-### 🖥️ Continuous Monitoring Visualization
-![Monitoring Demo](docs/screenshots/monitoring_demo.gif)
-*Professional demonstration of SCCPT's continuous monitoring with real-time progress tracking (429KB, 12 frames)*
-
-### 🚨 Automatic Error Detection
-![Error Detection Demo](docs/screenshots/error_detection_demo.gif)
-*Shows how SCCPT automatically categorizes screenshots as stdout (normal) vs stderr (error) based on execution context (322KB, 5 frames)*
+| Feature Demo | Description |
+|--------------|-------------|
+| <details><summary><strong>🔄 Real Monitoring Session</strong></summary><img src="docs/screenshots/monitoring-session-demo.gif" width="280" alt="Real Monitoring Demo"><br><em>Real GIF from actual monitoring session</em><br><br><strong>Session Details:</strong><br>• 30s monitoring interval<br>• 11 automatic captures<br>• 2.8MB optimized GIF<br>• JPEG compression<br>• Timestamp-based naming</details> | <details><summary><strong>📋 Workflow Documentation</strong></summary><img src="docs/screenshots/workflow_demo.gif" width="280" alt="Workflow Demo"><br><em>Step-by-step process capture (230KB, 7 frames)</em><br><br><strong>Features:</strong><br>• Sequential capture<br>• Auto file organization<br>• Visual documentation<br>• Efficient compression</details> |
+| <details><summary><strong>🖥️ Continuous Monitoring</strong></summary><img src="docs/screenshots/monitoring_demo.gif" width="280" alt="Monitoring Demo"><br><em>Real-time progress tracking (429KB, 12 frames)</em><br><br><strong>Technical:</strong><br>• Real-time monitoring<br>• Progress visualization<br>• Frame compression<br>• Session management</details> | <details><summary><strong>🚨 Error Detection</strong></summary><img src="docs/screenshots/error_detection_demo.gif" width="280" alt="Error Detection Demo"><br><em>Context-aware categorization (322KB, 5 frames)</em><br><br><strong>Smart Features:</strong><br>• Error detection<br>• stdout/stderr tagging<br>• Exception integration<br>• Intelligent naming</details> |
 
 ## License
 
