@@ -22,7 +22,8 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/ywatanabe/sccpt",
-    packages=find_packages(),
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
@@ -40,7 +41,7 @@ setup(
     ],
     python_requires=">=3.7",
     install_requires=[
-        # Core dependencies (minimal by default)
+        "fastmcp>=2.0.0",
     ],
     extras_require={
         "full": [

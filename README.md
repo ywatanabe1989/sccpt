@@ -1,5 +1,5 @@
 <!-- ---
-!-- Timestamp: 2025-08-23 23:17:24
+!-- Timestamp: 2025-08-25 13:59:31
 !-- Author: ywatanabe
 !-- File: /home/ywatanabe/proj/sccpt/README.md
 !-- --- -->
@@ -24,9 +24,19 @@ A lightweight, efficient screen capture library with automatic error detection. 
 
 ## Installation
 
+### From PyPI (Recommended)
 ```bash
 pip install sccpt
 # pip install sccpt[full] # For full features including mss and Pillow support:
+```
+
+### From Source
+```bash
+git clone https://github.com/ywatanabe1989/sccpt.git
+cd sccpt
+
+# Install dependencies
+pip install -r requirements.txt
 ```
 
 ## Quick Start
@@ -85,6 +95,11 @@ sccpt.stop()
 ```python
 import sccpt
 
+# Method 1: Use Context Manager
+with sccpt.session() as session:
+    # ... your process ...
+
+# Method 2: Start/Stop Manually
 sccpt.start()
 # ... your process ...  
 sccpt.stop()
