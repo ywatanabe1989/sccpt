@@ -1,5 +1,5 @@
 <!-- ---
-!-- Timestamp: 2025-08-23 22:26:59
+!-- Timestamp: 2025-08-25 13:55:59
 !-- Author: ywatanabe
 !-- File: /home/ywatanabe/proj/sccpt/TODO.md
 !-- --- -->
@@ -113,7 +113,7 @@ sccpt.create_gif_with_annotations(
 **Minor Improvements:**
 1. Consider adding `__enter__`/`__exit__` for context manager support:
 ```python
-with sccpt.monitor() as session:
+with sccpt.session() as session:
     # Auto starts/stops
     perform_task()
 ```

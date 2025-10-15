@@ -6,17 +6,17 @@ A lightweight, cross-platform screen capture library optimized for WSL and Windo
 
 Features:
 - Windows host screen capture from WSL
-- JPEG compression for smaller file sizes  
+- JPEG compression for smaller file sizes
 - Continuous monitoring with configurable intervals
 - Human-readable timestamps
 - Thread-safe operation
 
 Usage:
     import sccpt
-    
+
     # Single screenshot
     sccpt.capture("debug message")
-    
+
     # Continuous monitoring
     sccpt.start()
     # ... do work ...
@@ -25,7 +25,7 @@ Usage:
 
 from .utils import (
     capture,
-    start_monitor, 
+    start_monitor,
     stop_monitor
 )
 from .gif import (
@@ -34,6 +34,7 @@ from .gif import (
     create_gif_from_pattern,
     create_gif_from_latest_session
 )
+from .session import session
 
 # Convenience aliases - these are the main public API
 cpt = capture      # Short alias for quick typing
@@ -50,8 +51,9 @@ __all__ = [
     "cpt",
     "start",
     "stop",
+    "session",
     "create_gif_from_session",
-    "create_gif_from_files", 
+    "create_gif_from_files",
     "create_gif_from_pattern",
     "create_gif_from_latest_session"
 ]
