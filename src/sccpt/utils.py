@@ -121,7 +121,7 @@ def capture(message: str = None, path: str = None, quality: int = 85, auto_categ
         output_dir=temp_dir,
         use_jpeg=use_jpeg,
         jpeg_quality=quality,
-        verbose=False
+        verbose=verbose  # Use the verbose parameter passed by user
     )
     
     worker.session_id = "capture"

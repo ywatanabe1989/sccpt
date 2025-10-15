@@ -172,8 +172,10 @@ class ScreenshotWorker:
                 return str(filepath)
                 
             return None
-            
-        except Exception:
+
+        except Exception as e:
+            if self.verbose:
+                print(f"❌ Screenshot failed: {e}")
             return None
     
     def _is_wsl(self) -> bool:
@@ -259,14 +261,19 @@ class ScreenshotWorker:
             
             # Fallback to inline script
             return self._capture_windows_screen_inline(filepath)
-            
-        except Exception:
-            pass
+
+        except Exception as e:
+            if self.verbose:
+                print(f"❌ Windows screen capture error: {e}")
+                import traceback
+                traceback.print_exc()
         return False
     
     def _capture_windows_screen_inline(self, filepath: Path) -> bool:
         """Fallback inline PowerShell capture (when .ps1 files not available)."""
         try:
+            if self.verbose:
+                print("🔍 Attempting inline PowerShell capture...")
             # Use base64 encoding to avoid path issues (most reliable for WSL)
             # Now with DPI awareness for proper high-resolution capture
             ps_script = """
@@ -319,22 +326,49 @@ class ScreenshotWorker:
             ps_exe = None
             for path in ps_paths:
                 try:
-                    # Test if path works
-                    test_result = subprocess.run([path, "-Command", "echo test"], 
-                                               capture_output=True, timeout=1)
-                    if test_result.returncode == 0:
+                    # Just check if the file exists and is executable
+                    test_path = Path(path) if not path.startswith('/mnt/') else Path(path)
+                    if path == "powershell.exe":
+                        # In PATH - use it directly
                         ps_exe = path
+                        if self.verbose:
+                            print(f"✓ Found PowerShell in PATH")
+                        break
+                    elif test_path.exists() or Path(path).exists():
+                        ps_exe = path
+                        if self.verbose:
+                            print(f"✓ Found PowerShell at {path}")
                         break
                 except:
                     continue
             
             if not ps_exe:
+                if self.verbose:
+                    print("❌ PowerShell executable not found")
                 return False
+
+            if self.verbose:
+                print(f"✓ Using PowerShell: {ps_exe}")
             
             # Execute PowerShell
             cmd = [ps_exe, "-NoProfile", "-Command", ps_script]
-            
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=3)
+
+            if self.verbose:
+                print("🔄 Executing PowerShell script...")
+
+            try:
+                result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+
+                if self.verbose:
+                    print(f"✓ PowerShell return code: {result.returncode}")
+                    if result.stderr:
+                        print(f"PowerShell stderr: {result.stderr[:500]}")
+                    if result.stdout:
+                        print(f"✓ PowerShell stdout length: {len(result.stdout)} chars")
+            except subprocess.TimeoutExpired as e:
+                if self.verbose:
+                    print(f"❌ PowerShell timeout after 10s")
+                return False
             
             if result.returncode == 0 and result.stdout.strip():
                 # Decode base64 PNG data
@@ -400,9 +434,10 @@ class ScreenshotWorker:
             
             result = subprocess.run(cmd, capture_output=True, timeout=2)
             return result.returncode == 0 and filepath.exists()
-            
-        except Exception:
-            pass
+
+        except Exception as e:
+            if self.verbose:
+                print(f"❌ Native screen capture failed: {e}")
         return False
     
     def get_status(self) -> dict:

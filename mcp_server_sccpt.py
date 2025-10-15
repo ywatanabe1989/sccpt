@@ -339,7 +339,7 @@ class SCCPTServer:
                 None,  # path
                 quality,
                 True,  # auto_categorize
-                False,  # verbose (quiet for MCP)
+                True,  # verbose - show errors for debugging
                 monitor_id,
                 capture_all,
                 1.0,  # max_cache_gb
