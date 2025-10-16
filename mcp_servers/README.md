@@ -1,6 +1,6 @@
 # MCP Server
 
-This directory contains the Model Context Protocol (MCP) server for the SCCPT project.
+This directory contains the Model Context Protocol (MCP) server for the CAM project.
 
 ## Available Server
 
@@ -61,7 +61,7 @@ Configure the server in your MCP client (e.g., Claude Desktop) by adding to the 
 ```json
 {
   "mcpServers": {
-    "sccpt": {
+    "cam": {
       "command": "fastmcp",
       "args": ["run", "/path/to/mcp_servers/mcp_server_fastmcp.py"]
     }

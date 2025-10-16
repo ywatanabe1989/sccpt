@@ -3,16 +3,16 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "sccpt"
-version = "0.1.0"
-description = "Lightweight screen capture library optimized for WSL and Windows"
+name = "cam"
+version = "0.2.0"
+description = "AI's camera - Multi-desktop screenshot capture with MCP server for AI agents"
 readme = "README.md"
 requires-python = ">=3.7"
 license = {text = "MIT"}
 authors = [
     {name = "Yusuke Watanabe", email = "Yusuke.Watanabe@scitex.ai"}
 ]
-keywords = ["screenshot", "screen-capture", "wsl", "windows", "monitoring", "automation"]
+keywords = ["screenshot", "screen-capture", "wsl", "windows", "monitoring", "automation", "ai-vision"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -37,6 +37,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+browser = [
+    "playwright>=1.40.0",
+]
 dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
@@ -46,11 +49,11 @@ dev = [
 ]
 
 [project.scripts]
-sccpt = "sccpt.cli:main"
+cam = "cam.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/ywatanabe/sccpt"
-Repository = "https://github.com/ywatanabe/sccpt"
+Homepage = "https://github.com/ywatanabe1989/cam"
+Repository = "https://github.com/ywatanabe1989/cam"
 
 [tool.setuptools.packages.find]
 where = ["src"]

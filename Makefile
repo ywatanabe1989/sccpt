@@ -1,4 +1,4 @@
-# Makefile for sccpt package
+# Makefile for cam package
 
 # Use Python from virtual environment if activated, otherwise use python3
 ifdef VIRTUAL_ENV

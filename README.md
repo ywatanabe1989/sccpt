@@ -1,10 +1,10 @@
 <!-- ---
-!-- Timestamp: 2025-08-25 13:59:31
+!-- Timestamp: 2025-10-17 03:28:14
 !-- Author: ywatanabe
-!-- File: /home/ywatanabe/proj/sccpt/README.md
+!-- File: /home/ywatanabe/proj/cam/README.md
 !-- --- -->
 
-# SCCPT - Python Screen Capture with MCP Server Support
+# CAM - Python Screen Capture with MCP Server Support
 *- shared visual context between users and AI agents -*
 
 A lightweight, efficient screen capture library with automatic error detection. **Features full MCP (Model Context Protocol) server integration for seamless AI assistant workflows.** Optimized for WSL2 to capture Windows host screens.
@@ -14,7 +14,7 @@ A lightweight, efficient screen capture library with automatic error detection. 
 ### 📸 Single Screenshot Capture
 <img src="docs/screenshots/demo-single-capture.jpg" width="400" alt="Demo Screenshot">
 
-*Example of SCCPT's single screenshot capture functionality with custom message*
+*Example of CAM's single screenshot capture functionality with custom message*
 
 | Feature Demo | Description |
 |--------------|-------------|
@@ -26,14 +26,14 @@ A lightweight, efficient screen capture library with automatic error detection. 
 
 ### From PyPI (Recommended)
 ```bash
-pip install sccpt
-# pip install sccpt[full] # For full features including mss and Pillow support:
+pip install cam
+# pip install cam[full] # For full features including mss and Pillow support:
 ```
 
 ### From Source
 ```bash
-git clone https://github.com/ywatanabe1989/sccpt.git
-cd sccpt
+git clone https://github.com/ywatanabe1989/cam.git
+cd cam
 
 # Install dependencies
 pip install -r requirements.txt
@@ -41,15 +41,22 @@ pip install -r requirements.txt
 
 ## Quick Start
 
-### 🐍 Python API - Beautiful Simplicity (Just 4 Functions)
+### 🐍 Python API - Beautiful Simplicity
 
 ```python
-import sccpt
+import cam
 
-sccpt.cpt()                          # Capture single screenshot
-sccpt.start()                        # Start monitoring  
-sccpt.stop()                         # Stop monitoring
-sccpt.create_gif_from_latest_session()  # Create GIF summary
+# Core functions
+cam.snap()                          # Capture single screenshot
+cam.start()                        # Start monitoring
+cam.stop()                         # Stop monitoring
+cam.create_gif_from_latest_session()  # Create GIF summary
+
+# Multi-desktop features
+cam.get_info()           # List all monitors and windows
+cam.snap(monitor_id=1)             # Capture specific monitor
+cam.snap(capture_all=True)         # Capture all monitors
+cam.start(monitor_id=0)           # Monitor specific screen
 ```
 
 <details>
@@ -58,53 +65,56 @@ sccpt.create_gif_from_latest_session()  # Create GIF summary
 ### 🐛 Debug Your Code Visually
 
 ```python
-import sccpt
+import cam
 
 def process_data(df):
-    sccpt.cpt("before transformation")
+    cam.snap("before transformation")
     df = df.transform(complex_operation)
-    sccpt.cpt("after transformation")
+    cam.snap("after transformation")
     return df
 ```
 
 ### 🚨 Automatic Error Screenshots
 
 ```python
-import sccpt
+import cam
 
 try:
     selenium_driver.click(button)
     api_response = fetch_data()
 except Exception as e:
-    sccpt.cpt()  # Auto-adds -stderr suffix
+    cam.snap()  # Auto-adds -stderr suffix
     raise
 ```
 
 ### 🔍 Monitor Long-Running Processes
 
 ```python
-import sccpt
+import cam
 
-sccpt.start()  # Start taking screenshots every second
+cam.start()  # Start taking screenshots every second
 train_model()  # Your long operation
-sccpt.stop()
+cam.stop()
+
+# Multi-monitor monitoring
+cam.start(capture_all=True, interval=2.0)  # All monitors, 2s interval
 ```
 
 ### 🎬 Create GIF Summaries
 
 ```python
-import sccpt
+import cam
 
 # Method 1: Use Context Manager
-with sccpt.session() as session:
+with cam.session() as session:
     # ... your process ...
 
 # Method 2: Start/Stop Manually
-sccpt.start()
+cam.start()
 # ... your process ...  
-sccpt.stop()
-sccpt.create_gif_from_latest_session()
-# 📹 GIF created: ~/.cache/sccpt/20250823_104523_summary.gif
+cam.stop()
+cam.create_gif_from_latest_session()
+# 📹 GIF created: ~/.cache/cam/20250823_104523_summary.gif
 ```
 
 ## Configuration
@@ -112,18 +122,48 @@ sccpt.create_gif_from_latest_session()
 All configuration through function parameters - no config files needed!
 
 ```python
-sccpt.start(
+cam.start(
     output_dir="~/screenshots",  # Where to save
     interval=2.0,                # Seconds between captures
     quality=85,                  # JPEG quality (1-100)
-    verbose=False                # Silent mode
+    verbose=False,               # Silent mode
+    monitor_id=0,                # Specific monitor (0-based)
+    capture_all=False            # Capture all monitors
 )
+```
+
+### 🖥️ Multi-Desktop & Monitor Features
+
+```python
+import cam
+
+# Enumerate available monitors and windows
+info = cam.get_info()
+print(f"Monitors: {info['Monitors']['Count']}")
+print(f"Windows: {info['Windows']['VisibleCount']}")
+
+# Capture specific monitor
+cam.snap(monitor_id=0)    # Primary monitor
+cam.snap(monitor_id=1)    # Secondary monitor
+
+# Capture all monitors combined
+cam.snap(capture_all=True)
+
+# Capture specific window by handle
+windows = info['Windows']['Details']
+if windows:
+    handle = windows[0]['Handle']
+    path = cam.capture_window(handle)
+    print(f"Captured window: {path}")
+
+# Monitor specific screen continuously
+cam.start(monitor_id=1, interval=3.0)
 ```
 
 ## File Structure
 
 ```
-~/.cache/sccpt/
+~/.cache/cam/
 ├── 20250823_104523-message-stdout.jpg    # Normal capture
 ├── 20250823_104525-error-stderr.jpg      # Error capture  
 └── 20250823_104530_0001_*.jpg            # Monitoring mode
@@ -153,13 +193,24 @@ Optional:
 
 ### Setup - Just Add JSON!
 
-```json
+<!-- ```json
+ !-- // Add to your Claude Code settings
+ !-- {
+ !--   "mcpServers": {
+ !--     "cam": {
+ !--       "command": "python", 
+ !--       "args": ["/path/to/cam/mcp_server_cam.py"]
+ !--     }
+ !--   }
+ !-- }
+ !-- ``` -->
+``` json
 // Add to your Claude Code settings
 {
   "mcpServers": {
-    "sccpt": {
+    "cam": {
       "command": "python", 
-      "args": ["/path/to/sccpt/mcp_server_sccpt.py"]
+      "args": ["-m", "cam", "--mcp"]
     }
   }
 }
@@ -187,10 +238,12 @@ Optional:
 ## Use Cases & Examples
 
 ### 📸 **Essential Use Cases**
-- **Debug visually** - Capture before/after states during development  
+- **Debug visually** - Capture before/after states during development
 - **Monitor processes** - Continuous screenshots during long operations
 - **Document workflows** - Step-by-step visual documentation
 - **Error analysis** - Automatic error categorization and screenshots
+- **Multi-monitor setup** - Capture specific monitors or all screens simultaneously
+- **Window enumeration** - List and target specific application windows
 - **AI-powered automation** - Let AI assistants capture and analyze screens via MCP integration
 
 

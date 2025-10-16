@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Create demonstration GIFs for the SCCPT documentation.
+Create demonstration GIFs for the CAM documentation.
 """
 
 import os
@@ -8,17 +8,17 @@ import sys
 from pathlib import Path
 import time
 
-# Add the sccpt package to the path
+# Add the cam package to the path
 sys.path.insert(0, str(Path(__file__).parent))
 
-import sccpt
+import cam
 from PIL import Image, ImageDraw, ImageFont
 
 def create_workflow_demo_gif():
     """Create a GIF demonstrating a typical workflow."""
     print("Creating workflow demonstration GIF...")
     
-    temp_dir = Path("/tmp/sccpt_demo_workflow")
+    temp_dir = Path("/tmp/cam_demo_workflow")
     temp_dir.mkdir(exist_ok=True)
     
     # Create workflow steps
@@ -47,7 +47,7 @@ def create_workflow_demo_gif():
             small_font = font
         
         # Draw step number and title
-        draw.text((50, 50), f"SCCPT Demo", fill=(50, 50, 50), font=font)
+        draw.text((50, 50), f"CAM Demo", fill=(50, 50, 50), font=font)
         draw.text((50, 100), step_text, fill=(20, 20, 20), font=font)
         
         # Draw some mock UI elements
@@ -86,7 +86,7 @@ def create_workflow_demo_gif():
     
     # Create GIF
     output_path = temp_dir / "workflow_demo.gif"
-    result = sccpt.create_gif_from_files(
+    result = cam.create_gif_from_files(
         image_paths=image_paths,
         output_path=str(output_path),
         duration=1.2,  # Slower for readability
@@ -99,7 +99,7 @@ def create_monitoring_demo_gif():
     """Create a GIF demonstrating continuous monitoring."""
     print("Creating monitoring demonstration GIF...")
     
-    temp_dir = Path("/tmp/sccpt_demo_monitoring")
+    temp_dir = Path("/tmp/cam_demo_monitoring")
     temp_dir.mkdir(exist_ok=True)
     
     # Simulate a monitoring session showing system activity
@@ -117,12 +117,12 @@ def create_monitoring_demo_gif():
             small_font = font
         
         # Title
-        draw.text((50, 30), "SCCPT Continuous Monitoring Demo", fill=(50, 50, 150), font=font)
+        draw.text((50, 30), "CAM Continuous Monitoring Demo", fill=(50, 50, 150), font=font)
         
         # Fake terminal/console output
         console_lines = [
-            "📸 Started monitoring: ~/.cache/sccpt/20250823_215059_NNNN_*.jpg",
-            f"📸 Capture #{i+1:03d}: ~/.cache/sccpt/20250823_215059_{i:04d}_screenshot.jpg",
+            "📸 Started monitoring: ~/.cache/cam/20250823_215059_NNNN_*.jpg",
+            f"📸 Capture #{i+1:03d}: ~/.cache/cam/20250823_215059_{i:04d}_screenshot.jpg",
             f"📊 Memory usage: {60 + i*2}%",
             f"🔄 CPU activity: {30 + (i*5) % 40}%",
             f"⏱️  Runtime: {i*2} seconds",
@@ -163,7 +163,7 @@ def create_monitoring_demo_gif():
     
     # Create GIF
     output_path = temp_dir / "monitoring_demo.gif"
-    result = sccpt.create_gif_from_files(
+    result = cam.create_gif_from_files(
         image_paths=frames,
         output_path=str(output_path),
         duration=0.8,
@@ -176,7 +176,7 @@ def create_error_detection_demo_gif():
     """Create a GIF demonstrating error detection."""
     print("Creating error detection demonstration GIF...")
     
-    temp_dir = Path("/tmp/sccpt_demo_error")
+    temp_dir = Path("/tmp/cam_demo_error")
     temp_dir.mkdir(exist_ok=True)
     
     scenarios = [
@@ -201,7 +201,7 @@ def create_error_detection_demo_gif():
             small_font = font
         
         # Title
-        draw.text((50, 40), "SCCPT Auto Error Detection", fill=(50, 50, 100), font=font)
+        draw.text((50, 40), "CAM Auto Error Detection", fill=(50, 50, 100), font=font)
         
         # Scenario
         draw.text((50, 100), f"Scenario: {title}", fill=(80, 80, 80), font=font)
@@ -219,11 +219,11 @@ def create_error_detection_demo_gif():
         
         # Mock file path
         filename_suffix = "-stderr.jpg" if category == "stderr" else "-stdout.jpg"
-        filepath = f"~/.cache/sccpt/20250823_215{10+i:02d}_001{filename_suffix}"
+        filepath = f"~/.cache/cam/20250823_215{10+i:02d}_001{filename_suffix}"
         draw.text((50, 300), f"📁 Saved as: {filepath}", fill=(100, 100, 100), font=small_font)
         
         # Show automatic categorization process
-        draw.text((50, 350), "🤖 SCCPT automatically detected:", fill=(50, 50, 150), font=small_font)
+        draw.text((50, 350), "🤖 CAM automatically detected:", fill=(50, 50, 150), font=small_font)
         detection_text = "Exception context → stderr category" if category == "stderr" else "Normal execution → stdout category"
         draw.text((80, 380), detection_text, fill=(80, 80, 80), font=small_font)
         
@@ -236,7 +236,7 @@ def create_error_detection_demo_gif():
     
     # Create GIF
     output_path = temp_dir / "error_detection_demo.gif"
-    result = sccpt.create_gif_from_files(
+    result = cam.create_gif_from_files(
         image_paths=frames,
         output_path=str(output_path),
         duration=1.5,  # Slower for readability
@@ -247,7 +247,7 @@ def create_error_detection_demo_gif():
 
 def main():
     """Create all demo GIFs."""
-    print("🎬 Creating SCCPT demonstration GIFs...\n")
+    print("🎬 Creating CAM demonstration GIFs...\n")
     
     gifs_created = []
     

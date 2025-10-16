@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Timestamp: "2025-08-25 13:56:53 (ywatanabe)"
-# File: /home/ywatanabe/proj/sccpt/src/sccpt/session.py
+# File: /home/ywatanabe/proj/cam/src/cam/session.py
 # ----------------------------------------
 from __future__ import annotations
 import os
 __FILE__ = (
-    "./src/sccpt/session.py"
+    "./src/cam/session.py"
 )
 __DIR__ = os.path.dirname(__FILE__)
 # ----------------------------------------
 class Session:
-    """Context manager for SCCPT session with automatic start/stop."""
+    """Context manager for CAM session with automatic start/stop."""
 
     def __init__(
         self,
-        output_dir: str = "~/.cache/sccpt/",
+        output_dir: str = "~/.cache/cam/",
         interval: float = 1.0,
         jpeg: bool = True,
         quality: int = 60,
