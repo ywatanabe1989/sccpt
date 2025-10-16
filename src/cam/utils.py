@@ -91,6 +91,9 @@ def capture(
     all: bool = False,
     app: str = None,
     url: str = None,
+    url_wait: int = 3,
+    url_width: int = 1920,
+    url_height: int = 1080,
     max_cache_gb: float = 1.0,
 ) -> str:
     """
@@ -110,6 +113,12 @@ def capture(
         App name to capture (e.g., "chrome", "code")
     url : str, optional
         URL to capture via browser (e.g., "http://127.0.0.1:8000/")
+    url_wait : int
+        Seconds to wait for page load (default: 3)
+    url_width : int
+        Browser window width for URL capture (default: 1920)
+    url_height : int
+        Browser window height for URL capture (default: 1080)
     monitor_id : int
         Monitor to capture (0-based, default: 0)
 
@@ -133,7 +142,75 @@ def capture(
         if not url.startswith(("http://", "https://", "file://")):
             url = f"http://{url}"
 
-        # For WSL: Use Windows-side browser to capture Windows host URLs
+        # Try Playwright first (headless, non-interfering)
+        try:
+            from playwright.sync_api import sync_playwright
+
+            if path is None:
+                timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
+                url_slug = (
+                    url.replace("://", "_")
+                    .replace("/", "_")
+                    .replace(":", "_")[:30]
+                )
+                path = f"~/.cache/cam/{timestamp_str}-url-{url_slug}.jpg"
+
+            path = os.path.expanduser(path)
+
+            if verbose:
+                print(f"📸 Capturing URL: {url}")
+
+            # Check if DISPLAY is set (WSL with X11 forward causes visible browser)
+            import os as _os
+            original_display = _os.environ.get('DISPLAY')
+
+            # Force headless by unsetting DISPLAY temporarily
+            if original_display:
+                _os.environ.pop('DISPLAY', None)
+
+            try:
+                with sync_playwright() as p:
+                    # Use stealth args from scitex.browser
+                    stealth_args = [
+                        "--no-sandbox",
+                        "--disable-dev-shm-usage",
+                        "--disable-blink-features=AutomationControlled",
+                        "--window-size=1920,1080",
+                    ]
+                    browser = p.chromium.launch(
+                        headless=True,
+                        args=stealth_args
+                    )
+                    context = browser.new_context(
+                        viewport={"width": url_width, "height": url_height}
+                    )
+                    page = context.new_page()
+                    # Use domcontentloaded for faster capture, with longer timeout
+                    page.goto(url, wait_until="domcontentloaded", timeout=30000)
+                    # Wait additional time for rendering
+                    page.wait_for_timeout(url_wait * 1000)
+                    page.screenshot(path=path, type="jpeg", quality=quality, full_page=False)
+                    browser.close()
+            finally:
+                # Restore DISPLAY
+                if original_display:
+                    _os.environ['DISPLAY'] = original_display
+
+            if Path(path).exists():
+                if verbose:
+                    print(f"📸 URL: {path}")
+                return path
+
+        except ImportError:
+            if verbose:
+                print("⚠️  Playwright not installed: pip install cam[browser]")
+            pass  # Try PowerShell fallback
+        except Exception as e:
+            if verbose:
+                print(f"⚠️  Playwright failed: {e}")
+            pass  # Try PowerShell fallback
+
+        # For WSL: Fallback to Windows-side browser
         if (
             sys.platform == "linux"
             and "microsoft" in os.uname().release.lower()
@@ -192,6 +269,12 @@ def capture(
                             str(script_path),
                             "-Url",
                             url,
+                            "-WaitSeconds",
+                            str(url_wait),
+                            "-WindowWidth",
+                            str(url_width),
+                            "-WindowHeight",
+                            str(url_height),
                         ]
 
                         result = subprocess.run(
@@ -248,51 +331,14 @@ def capture(
                                             return path.replace(".jpg", ".png")
                                     break
 
-                # Fallback to opening browser and capturing
-                if verbose:
-                    print("⚠️  Script method failed, opening browser...")
-
             except Exception as e:
                 if verbose:
-                    print(f"⚠️  URL capture error: {e}")
+                    print(f"⚠️  PowerShell URL capture failed: {e}")
 
-        # For native Linux/Mac: Use Playwright
-        else:
-            try:
-                from playwright.sync_api import sync_playwright
-
-                if path is None:
-                    timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
-                    url_slug = url.replace("://", "_").replace("/", "_")[:30]
-                    path = f"~/.cache/cam/{timestamp_str}-url-{url_slug}.jpg"
-
-                path = os.path.expanduser(path)
-
-                if verbose:
-                    print(f"📸 Capturing URL: {url}")
-
-                with sync_playwright() as p:
-                    browser = p.chromium.launch(headless=True)
-                    page = browser.new_page()
-                    page.goto(url, wait_until="networkidle")
-                    page.screenshot(path=path, type="jpeg", quality=quality)
-                    browser.close()
-
-                if Path(path).exists():
-                    if verbose:
-                        print(f"📸 URL: {path}")
-                    return path
-
-            except ImportError:
-                if verbose:
-                    print(
-                        "⚠️  Playwright not installed: pip install cam[browser]"
-                    )
-                return None
-            except Exception as e:
-                if verbose:
-                    print(f"❌ URL capture failed: {e}")
-                return None
+        # If all methods failed
+        if verbose:
+            print("❌ URL capture failed - Playwright not available and PowerShell failed")
+        return None
 
     # Handle app-specific capture
     if app:
