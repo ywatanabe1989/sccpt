@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-FastMCP Server for SCCPT - Screen Capture for Python
+FastMCP Server for CAM - Screen Capture for Python
 Provides screenshot capture capabilities via Model Context Protocol using FastMCP.
 """
 
@@ -9,10 +9,10 @@ from pathlib import Path
 import base64
 from datetime import datetime
 import asyncio
-import sccpt
+import cammy
 
 
-mcp = FastMCP("sccpt-server")
+mcp = FastMCP("cammy-server")
 
 
 @mcp.tool()
@@ -37,7 +37,7 @@ def capture_screenshot(
         Dictionary with success status, path, and optionally base64 data
     """
     try:
-        path = sccpt.capture(
+        path = cammy.capture(
             message=message,
             path=None,
             quality=quality,
@@ -93,7 +93,7 @@ def start_monitoring(
         interval: Seconds between captures (default: 1.0)
         monitor_id: Monitor number (0-based, default: 0 for primary monitor)
         capture_all: Capture all monitors combined into single image (overrides monitor_id)
-        output_dir: Directory for screenshots (default: ~/.cache/sccpt)
+        output_dir: Directory for screenshots (default: ~/.cache/cammy)
         quality: JPEG quality (1-100, default: 60)
         verbose: Show capture messages
     
@@ -101,7 +101,7 @@ def start_monitoring(
         Dictionary with success status and monitoring details
     """
     # Check if already monitoring (simplified - FastMCP doesn't have persistent state)
-    cache_dir = Path.home() / ".cache" / "sccpt"
+    cache_dir = Path.home() / ".cache" / "cammy"
     monitoring_file = cache_dir / ".monitoring"
     
     if monitoring_file.exists():
@@ -111,8 +111,8 @@ def start_monitoring(
         }
     
     try:
-        monitoring_worker = sccpt.start_monitor(
-            output_dir=output_dir or "~/.cache/sccpt/",
+        monitoring_worker = cammy.start_monitor(
+            output_dir=output_dir or "~/.cache/cammy/",
             interval=interval,
             jpeg=True,
             quality=quality,
@@ -130,7 +130,7 @@ def start_monitoring(
         return {
             "success": True,
             "message": f"Started monitoring with {interval}s interval on monitor {monitor_id}",
-            "output_dir": output_dir or "~/.cache/sccpt/",
+            "output_dir": output_dir or "~/.cache/cammy/",
             "interval": interval,
             "monitor_id": monitor_id,
             "capture_all": capture_all,
@@ -151,7 +151,7 @@ def stop_monitoring() -> dict:
     Returns:
         Dictionary with success status and final statistics
     """
-    cache_dir = Path.home() / ".cache" / "sccpt"
+    cache_dir = Path.home() / ".cache" / "cammy"
     monitoring_file = cache_dir / ".monitoring"
     
     if not monitoring_file.exists():
@@ -161,7 +161,7 @@ def stop_monitoring() -> dict:
         }
     
     try:
-        sccpt.stop()
+        cammy.stop()
         
         # Remove monitoring marker file
         monitoring_file.unlink()
@@ -189,7 +189,7 @@ def get_monitoring_status() -> dict:
     Returns:
         Dictionary with monitoring status and cache statistics
     """
-    cache_dir = Path.home() / ".cache" / "sccpt"
+    cache_dir = Path.home() / ".cache" / "cammy"
     monitoring_file = cache_dir / ".monitoring"
     
     status = {
@@ -221,7 +221,7 @@ def analyze_screenshot(path: str) -> dict:
         Dictionary with analysis results
     """
     try:
-        from sccpt.utils import _detect_category
+        from cammy.utils import _detect_category
         
         category = _detect_category(path)
         
@@ -260,7 +260,7 @@ def list_recent_screenshots(limit: int = 10, category: str = "all") -> dict:
         Dictionary with list of recent screenshots
     """
     try:
-        cache_dir = Path.home() / ".cache" / "sccpt"
+        cache_dir = Path.home() / ".cache" / "cammy"
         if not cache_dir.exists():
             return {
                 "success": True,
@@ -317,7 +317,7 @@ def clear_cache(max_size_gb: float = 1.0, clear_all: bool = False) -> dict:
         Dictionary with cleanup results
     """
     try:
-        cache_dir = Path.home() / ".cache" / "sccpt"
+        cache_dir = Path.home() / ".cache" / "cammy"
         if not cache_dir.exists():
             return {
                 "success": True,
@@ -339,7 +339,7 @@ def clear_cache(max_size_gb: float = 1.0, clear_all: bool = False) -> dict:
                 "removed_count": removed
             }
         else:
-            from sccpt.utils import _manage_cache_size
+            from cammy.utils import _manage_cache_size
             
             _manage_cache_size(cache_dir, max_size_gb)
             
@@ -385,7 +385,7 @@ def create_gif(
         Dictionary with GIF creation results
     """
     try:
-        from sccpt.gif import GifCreator
+        from cammy.gif import GifCreator
         
         creator = GifCreator()
         
@@ -393,7 +393,7 @@ def create_gif(
         if session_id:
             if session_id == "latest":
                 result_path = creator.create_gif_from_recent_session(
-                    "~/.cache/sccpt",
+                    "~/.cache/cammy",
                     duration,
                     optimize,
                     max_frames
@@ -402,7 +402,7 @@ def create_gif(
                 result_path = creator.create_gif_from_session(
                     session_id,
                     output_path,
-                    "~/.cache/sccpt",
+                    "~/.cache/cammy",
                     duration,
                     optimize,
                     max_frames
@@ -410,7 +410,7 @@ def create_gif(
         elif image_paths:
             if not output_path:
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                output_path = f"~/.cache/sccpt/custom_gif_{timestamp}.gif"
+                output_path = f"~/.cache/cammy/custom_gif_{timestamp}.gif"
             
             result_path = creator.create_gif_from_files(
                 image_paths,
@@ -474,14 +474,14 @@ def list_sessions(limit: int = 10) -> dict:
         Dictionary with available sessions
     """
     try:
-        from sccpt.gif import GifCreator
+        from cammy.gif import GifCreator
         
         creator = GifCreator()
-        sessions = creator.get_recent_sessions("~/.cache/sccpt")
+        sessions = creator.get_recent_sessions("~/.cache/cammy")
         sessions = sessions[:limit]
         
         session_details = []
-        cache_dir = Path.home() / ".cache" / "sccpt"
+        cache_dir = Path.home() / ".cache" / "cammy"
         
         for session_id in sessions:
             jpg_files = list(cache_dir.glob(f"{session_id}_*.jpg"))
@@ -533,7 +533,7 @@ def get_screenshot(filename: str) -> str:
     Returns:
         Base64 encoded screenshot data
     """
-    cache_dir = Path.home() / ".cache" / "sccpt"
+    cache_dir = Path.home() / ".cache" / "cammy"
     filepath = cache_dir / filename
     
     if not filepath.exists():
@@ -558,7 +558,7 @@ def list_screenshots_resource(limit: int = 20) -> str:
     """
     import json
     
-    cache_dir = Path.home() / ".cache" / "sccpt"
+    cache_dir = Path.home() / ".cache" / "cammy"
     if not cache_dir.exists():
         return json.dumps({"screenshots": [], "message": "Cache directory does not exist"})
     

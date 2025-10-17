@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Timestamp: "2025-08-24 23:04:48 (ywatanabe)"
-# File: /home/ywatanabe/proj/sccpt/mcp_server_sccpt.py
+# Timestamp: "2025-10-17 03:24:58 (ywatanabe)"
+# File: /home/ywatanabe/proj/cammy/mcp_server_cammy.py
 # ----------------------------------------
 from __future__ import annotations
 import os
 __FILE__ = (
-    "./mcp_server_sccpt.py"
+    "./mcp_server_cammy.py"
 )
 __DIR__ = os.path.dirname(__FILE__)
 # ----------------------------------------
+
 """
-MCP Server for SCCPT - Screen Capture for Python
+MCP Server for CAM - Screen Capture for Python
 Provides screenshot capture capabilities via Model Context Protocol.
 """
 
@@ -25,12 +26,12 @@ from mcp.server import NotificationOptions, Server
 from mcp.server.models import InitializationOptions
 from mcp.server.stdio import stdio_server
 
-import sccpt
+import cammy
 
 
-class SCCPTServer:
+class CAMServer:
     def __init__(self):
-        self.server = Server("sccpt-server")
+        self.server = Server("cammy-server")
         self.monitoring_active = False
         self.monitoring_worker = None
         self.setup_handlers()
@@ -41,7 +42,7 @@ class SCCPTServer:
             return [
                 types.Tool(
                     name="capture_screenshot",
-                    description="Capture a single screenshot with optional message and categorization",
+                    description="Capture screenshot - monitor, window, browser, or everything including Windows screens from WSL",
                     inputSchema={
                         "type": "object",
                         "properties": {
@@ -54,10 +55,18 @@ class SCCPTServer:
                                 "description": "Monitor number (0-based, default: 0 for primary monitor)",
                                 "default": 0,
                             },
-                            "capture_all": {
+                            "all": {
                                 "type": "boolean",
-                                "description": "Capture all monitors combined into single image (overrides monitor_id)",
+                                "description": "Capture all monitors (shorthand)",
                                 "default": False,
+                            },
+                            "app": {
+                                "type": "string",
+                                "description": "App name to capture (e.g., 'chrome', 'code')",
+                            },
+                            "url": {
+                                "type": "string",
+                                "description": "URL to capture (e.g., '127.0.0.1:8000' or 'http://localhost:3000')",
                             },
                             "quality": {
                                 "type": "integer",
@@ -98,7 +107,7 @@ class SCCPTServer:
                             },
                             "output_dir": {
                                 "type": "string",
-                                "description": "Directory for screenshots (default: ~/.cache/sccpt)",
+                                "description": "Directory for screenshots (default: ~/.cache/cammy)",
                             },
                             "quality": {
                                 "type": "integer",
@@ -241,6 +250,47 @@ class SCCPTServer:
                         },
                     },
                 ),
+                types.Tool(
+                    name="get_info",
+                    description="Enumerate all monitors, virtual desktops, and visible windows",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {},
+                    },
+                ),
+                types.Tool(
+                    name="list_windows",
+                    description="List all visible windows with their handles and process names",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {},
+                    },
+                ),
+                types.Tool(
+                    name="capture_window",
+                    description="Capture a specific window by its handle",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "window_handle": {
+                                "type": "integer",
+                                "description": "Window handle from list_windows",
+                            },
+                            "output_path": {
+                                "type": "string",
+                                "description": "Optional output path for screenshot",
+                            },
+                            "quality": {
+                                "type": "integer",
+                                "description": "JPEG quality (1-100, default: 85)",
+                                "minimum": 1,
+                                "maximum": 100,
+                                "default": 85,
+                            },
+                        },
+                        "required": ["window_handle"],
+                    },
+                ),
             ]
 
         @self.server.call_tool()
@@ -263,13 +313,19 @@ class SCCPTServer:
                 return await self.create_gif(**arguments)
             elif name == "list_sessions":
                 return await self.list_sessions(**arguments)
+            elif name == "get_info":
+                return await self.get_info_tool()
+            elif name == "list_windows":
+                return await self.list_windows_tool()
+            elif name == "capture_window":
+                return await self.capture_window_tool(**arguments)
             else:
                 raise ValueError(f"Unknown tool: {name}")
 
         # Provide screenshots as resources
         @self.server.list_resources()
         async def handle_list_resources():
-            cache_dir = Path.home() / ".cache" / "sccpt"
+            cache_dir = Path.home() / ".cache" / "cammy"
             if not cache_dir.exists():
                 return []
 
@@ -308,7 +364,7 @@ class SCCPTServer:
         async def handle_read_resource(uri: str):
             if uri.startswith("screenshot://"):
                 filename = uri.replace("screenshot://", "")
-                filepath = Path.home() / ".cache" / "sccpt" / filename
+                filepath = Path.home() / ".cache" / "cammy" / filename
 
                 if filepath.exists():
                     with open(filepath, "rb") as f:
@@ -324,26 +380,30 @@ class SCCPTServer:
         self,
         message=None,
         monitor_id=0,
-        capture_all=False,
+        all=False,
+        app=None,
+        url=None,
         quality=85,
         return_base64=False,
     ):
-        """Capture a single screenshot."""
+        """Capture a screenshot - monitor, window, browser, or everything."""
         try:
-            # Run in thread pool since sccpt is sync
+            # Run in thread pool since cammy is sync
             loop = asyncio.get_event_loop()
-            path = await loop.run_in_executor(
-                None,
-                sccpt.capture,
-                message,
-                None,  # path
-                quality,
-                True,  # auto_categorize
-                True,  # verbose - show errors for debugging
-                monitor_id,
-                capture_all,
-                1.0,  # max_cache_gb
-            )
+
+            # Use cammy.snap which now handles all, app, url parameters
+            def do_capture():
+                return cammy.snap(
+                    message=message,
+                    quality=quality,
+                    monitor_id=monitor_id,
+                    all=all,
+                    app=app,
+                    url=url,
+                    verbose=True,
+                )
+
+            path = await loop.run_in_executor(None, do_capture)
 
             if not path:
                 return {
@@ -389,8 +449,8 @@ class SCCPTServer:
 
             # Use a lambda to pass the monitor parameters correctly
             def start_with_monitor():
-                return sccpt.start_monitor(
-                    output_dir=output_dir or "~/.cache/sccpt/",
+                return cammy.start_monitor(
+                    output_dir=output_dir or "~/.cache/cammy/",
                     interval=interval,
                     jpeg=True,
                     quality=quality,
@@ -410,7 +470,7 @@ class SCCPTServer:
             return {
                 "success": True,
                 "message": f"Started monitoring with {interval}s interval on monitor {monitor_id}",
-                "output_dir": output_dir or "~/.cache/sccpt/",
+                "output_dir": output_dir or "~/.cache/cammy/",
                 "interval": interval,
                 "monitor_id": monitor_id,
                 "capture_all": capture_all,
@@ -426,7 +486,7 @@ class SCCPTServer:
 
         try:
             loop = asyncio.get_event_loop()
-            await loop.run_in_executor(None, sccpt.stop)
+            await loop.run_in_executor(None, cammy.stop)
 
             # Get stats from worker
             stats = {}
@@ -448,7 +508,7 @@ class SCCPTServer:
         """Get monitoring status."""
         status = {
             "active": self.monitoring_active,
-            "cache_dir": str(Path.home() / ".cache" / "sccpt"),
+            "cache_dir": str(Path.home() / ".cache" / "cammy"),
         }
 
         if self.monitoring_active and self.monitoring_worker:
@@ -463,7 +523,7 @@ class SCCPTServer:
             )
 
         # Get cache size
-        cache_dir = Path.home() / ".cache" / "sccpt"
+        cache_dir = Path.home() / ".cache" / "cammy"
         if cache_dir.exists():
             total_size = sum(f.stat().st_size for f in cache_dir.glob("*.jpg"))
             status["cache_size_mb"] = round(total_size / (1024 * 1024), 2)
@@ -474,8 +534,8 @@ class SCCPTServer:
     async def analyze_screenshot(self, path: str):
         """Analyze screenshot for errors/warnings."""
         try:
-            # Use sccpt's internal detection
-            from sccpt.utils import _detect_category
+            # Use cammy's internal detection
+            from cammy.utils import _detect_category
 
             loop = asyncio.get_event_loop()
             category = await loop.run_in_executor(None, _detect_category, path)
@@ -501,7 +561,7 @@ class SCCPTServer:
     async def list_recent_screenshots(self, limit=10, category="all"):
         """List recent screenshots from cache."""
         try:
-            cache_dir = Path.home() / ".cache" / "sccpt"
+            cache_dir = Path.home() / ".cache" / "cammy"
             if not cache_dir.exists():
                 return {
                     "success": True,
@@ -558,7 +618,7 @@ class SCCPTServer:
     async def clear_cache(self, max_size_gb=1.0, clear_all=False):
         """Clear or manage cache size."""
         try:
-            cache_dir = Path.home() / ".cache" / "sccpt"
+            cache_dir = Path.home() / ".cache" / "cammy"
             if not cache_dir.exists():
                 return {
                     "success": True,
@@ -581,8 +641,8 @@ class SCCPTServer:
                     "removed_count": removed,
                 }
             else:
-                # Use sccpt's cache management
-                from sccpt.utils import _manage_cache_size
+                # Use cammy's cache management
+                from cammy.utils import _manage_cache_size
 
                 loop = asyncio.get_event_loop()
                 await loop.run_in_executor(
@@ -615,7 +675,7 @@ class SCCPTServer:
     ):
         """Create GIF from screenshots."""
         try:
-            from sccpt.gif import GifCreator
+            from cammy.gif import GifCreator
 
             creator = GifCreator()
             loop = asyncio.get_event_loop()
@@ -627,7 +687,7 @@ class SCCPTServer:
                     result_path = await loop.run_in_executor(
                         None,
                         creator.create_gif_from_recent_session,
-                        "~/.cache/sccpt",
+                        "~/.cache/cammy",
                         duration,
                         optimize,
                         max_frames,
@@ -639,7 +699,7 @@ class SCCPTServer:
                         creator.create_gif_from_session,
                         session_id,
                         output_path,
-                        "~/.cache/sccpt",
+                        "~/.cache/cammy",
                         duration,
                         optimize,
                         max_frames,
@@ -648,7 +708,7 @@ class SCCPTServer:
                 # Use specific image paths
                 if not output_path:
                     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                    output_path = f"~/.cache/sccpt/custom_gif_{timestamp}.gif"
+                    output_path = f"~/.cache/cammy/custom_gif_{timestamp}.gif"
 
                 result_path = await loop.run_in_executor(
                     None,
@@ -705,13 +765,13 @@ class SCCPTServer:
     async def list_sessions(self, limit=10):
         """List available monitoring sessions."""
         try:
-            from sccpt.gif import GifCreator
+            from cammy.gif import GifCreator
 
             creator = GifCreator()
             loop = asyncio.get_event_loop()
 
             sessions = await loop.run_in_executor(
-                None, creator.get_recent_sessions, "~/.cache/sccpt"
+                None, creator.get_recent_sessions, "~/.cache/cammy"
             )
 
             # Limit results
@@ -719,7 +779,7 @@ class SCCPTServer:
 
             # Get details for each session
             session_details = []
-            cache_dir = Path.home() / ".cache" / "sccpt"
+            cache_dir = Path.home() / ".cache" / "cammy"
 
             for session_id in sessions:
                 # Count screenshots in session
@@ -764,16 +824,88 @@ class SCCPTServer:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
+    async def get_info_tool(self):
+        """Enumerate all monitors and virtual desktops."""
+        try:
+            loop = asyncio.get_event_loop()
+            info = await loop.run_in_executor(None, cammy.get_info)
+
+            return {
+                "success": True,
+                "monitors": info.get("Monitors", {}),
+                "virtual_desktops": info.get("VirtualDesktops", {}),
+                "windows": info.get("Windows", {}),
+                "timestamp": info.get("Timestamp", ""),
+            }
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    async def list_windows_tool(self):
+        """List all visible windows."""
+        try:
+            loop = asyncio.get_event_loop()
+            info = await loop.run_in_executor(None, cammy.get_info)
+
+            windows = info.get("Windows", {})
+            window_list = windows.get("Details", [])
+
+            # Format for easy use
+            formatted_windows = []
+            for win in window_list:
+                formatted_windows.append(
+                    {
+                        "handle": win.get("Handle"),
+                        "title": win.get("Title"),
+                        "process_name": win.get("ProcessName"),
+                        "process_id": win.get("ProcessId"),
+                    }
+                )
+
+            return {
+                "success": True,
+                "windows": formatted_windows,
+                "count": len(formatted_windows),
+                "visible_count": windows.get("VisibleCount", 0),
+                "message": f"Found {len(formatted_windows)} windows on current virtual desktop",
+            }
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    async def capture_window_tool(
+        self, window_handle: int, output_path: str = None, quality: int = 85
+    ):
+        """Capture a specific window by handle."""
+        try:
+            loop = asyncio.get_event_loop()
+            path = await loop.run_in_executor(
+                None, cammy.capture_window, window_handle, output_path
+            )
+
+            if path:
+                return {
+                    "success": True,
+                    "path": path,
+                    "window_handle": window_handle,
+                    "message": f"Window captured to {path}",
+                }
+            else:
+                return {
+                    "success": False,
+                    "error": f"Failed to capture window {window_handle}",
+                }
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
 
 async def main():
     """Main entry point for the MCP server."""
-    server = SCCPTServer()
+    server = CAMServer()
     async with stdio_server() as (read_stream, write_stream):
         await server.server.run(
             read_stream,
             write_stream,
             InitializationOptions(
-                server_name="sccpt",
+                server_name="cammy",
                 server_version="0.1.0",
                 capabilities=server.server.get_capabilities(
                     notification_options=NotificationOptions(),

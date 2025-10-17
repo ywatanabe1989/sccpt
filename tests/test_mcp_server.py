@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Tests for SCCPT MCP Server (FastMCP version)
+Tests for CAM MCP Server (FastMCP version)
 """
 
 import pytest
@@ -17,14 +17,14 @@ from mcp_server_fastmcp import mcp
 from fastmcp import Client
 
 
-class TestSCCPTMCPServer:
-    """Test suite for SCCPT MCP server functionality."""
+class TestCAMMCPServer:
+    """Test suite for CAM MCP server functionality."""
 
     @pytest.fixture
     def temp_cache_dir(self):
         """Create a temporary cache directory for testing."""
         temp_dir = tempfile.mkdtemp()
-        cache_dir = Path(temp_dir) / ".cache" / "sccpt"
+        cache_dir = Path(temp_dir) / ".cache" / "cammy"
         cache_dir.mkdir(parents=True, exist_ok=True)
         
         # Mock the cache directory
@@ -79,13 +79,13 @@ class TestSCCPTMCPServer:
 
     @pytest.mark.asyncio 
     async def test_capture_screenshot_mock(self, client, temp_cache_dir):
-        """Test screenshot capture with mocked sccpt."""
+        """Test screenshot capture with mocked cammy."""
         mock_path = str(temp_cache_dir / "test-stdout.jpg")
         
         # Create a mock screenshot file
         Path(mock_path).write_bytes(b"fake_image_data")
         
-        with patch('mcp_server_fastmcp.sccpt.capture') as mock_capture:
+        with patch('mcp_server_fastmcp.cammy.capture') as mock_capture:
             mock_capture.return_value = mock_path
             
             result = await client.call_tool("capture_screenshot", {
@@ -108,7 +108,7 @@ class TestSCCPTMCPServer:
         
         Path(mock_path).write_bytes(test_data)
         
-        with patch('mcp_server_fastmcp.sccpt.capture') as mock_capture:
+        with patch('mcp_server_fastmcp.cammy.capture') as mock_capture:
             mock_capture.return_value = mock_path
             
             result = await client.call_tool("capture_screenshot", {
@@ -125,7 +125,7 @@ class TestSCCPTMCPServer:
     @pytest.mark.asyncio
     async def test_capture_screenshot_failure(self, client):
         """Test screenshot capture failure handling."""
-        with patch('mcp_server_fastmcp.sccpt.capture') as mock_capture:
+        with patch('mcp_server_fastmcp.cammy.capture') as mock_capture:
             mock_capture.return_value = None  # Simulate failure
             
             result = await client.call_tool("capture_screenshot", {})
@@ -137,7 +137,7 @@ class TestSCCPTMCPServer:
     @pytest.mark.asyncio
     async def test_start_monitoring(self, client, temp_cache_dir):
         """Test monitoring start functionality."""
-        with patch('mcp_server_fastmcp.sccpt.start_monitor') as mock_start:
+        with patch('mcp_server_fastmcp.cammy.start_monitor') as mock_start:
             mock_monitor = MagicMock()
             mock_start.return_value = mock_monitor
             
@@ -176,7 +176,7 @@ class TestSCCPTMCPServer:
         monitoring_file = temp_cache_dir / ".monitoring" 
         monitoring_file.write_text("active")
         
-        with patch('mcp_server_fastmcp.sccpt.stop') as mock_stop:
+        with patch('mcp_server_fastmcp.cammy.stop') as mock_stop:
             result = await client.call_tool("stop_monitoring", {})
             response = json.loads(result.content[0].text)
             
@@ -461,7 +461,7 @@ class TestSCCPTMCPServer:
 
 
 class TestMCPServerIntegration:
-    """Integration tests for MCP server with real sccpt functionality."""
+    """Integration tests for MCP server with real cammy functionality."""
 
     @pytest.mark.asyncio
     async def test_server_startup(self):

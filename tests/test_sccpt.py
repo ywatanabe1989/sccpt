@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Timestamp: "2025-08-23 22:33:44 (ywatanabe)"
-# File: /home/ywatanabe/proj/sccpt/tests/test_sccpt.py
+# File: /home/ywatanabe/proj/cammy/tests/test_cammy.py
 # ----------------------------------------
 from __future__ import annotations
 import os
 __FILE__ = (
-    "./tests/test_sccpt.py"
+    "./tests/test_cammy.py"
 )
 __DIR__ = os.path.dirname(__FILE__)
 # ----------------------------------------
 """
-Tests for sccpt package using pytest.
+Tests for cammy package using pytest.
 """
 
 import sys
@@ -23,7 +23,7 @@ import pytest
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import sccpt
+import cammy
 
 
 class TestBasicCapture:
@@ -31,14 +31,14 @@ class TestBasicCapture:
 
     def test_import(self):
         """Test that package can be imported."""
-        assert sccpt is not None
-        assert hasattr(sccpt, "cpt")
-        assert hasattr(sccpt, "start")
-        assert hasattr(sccpt, "stop")
+        assert cammy is not None
+        assert hasattr(cammy, "cpt")
+        assert hasattr(cammy, "start")
+        assert hasattr(cammy, "stop")
 
     def test_single_capture(self):
         """Test single screenshot capture."""
-        path = sccpt.cpt("test capture")
+        path = cammy.snap("test capture")
         assert path is not None
         assert os.path.exists(path)
         assert path.endswith("-stdout.jpg")
@@ -49,7 +49,7 @@ class TestBasicCapture:
         try:
             raise ValueError("Test error")
         except:
-            path = sccpt.cpt("error test")
+            path = cammy.snap("error test")
             assert path is not None
             assert os.path.exists(path)
             assert path.endswith("-stderr.jpg")
@@ -59,7 +59,7 @@ class TestBasicCapture:
         with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
             tmp_path = tmp.name
 
-        path = sccpt.cpt("custom path", path=tmp_path)
+        path = cammy.snap("custom path", path=tmp_path)
         assert path == tmp_path
         assert os.path.exists(path)
 
@@ -68,7 +68,7 @@ class TestBasicCapture:
 
     def test_timestamp_placeholder(self):
         """Test timestamp placeholder in path."""
-        path = sccpt.cpt("timestamp test", path="/tmp/test-<timestamp>.jpg")
+        path = cammy.snap("timestamp test", path="/tmp/test-<timestamp>.jpg")
         assert path is not None
         assert os.path.exists(path)
         assert "/tmp/test-" in path
@@ -84,7 +84,7 @@ class TestMonitoring:
     def test_start_stop(self):
         """Test starting and stopping monitoring."""
         # Start monitoring
-        worker = sccpt.start(verbose=False)
+        worker = cammy.start(verbose=False)
         assert worker is not None
         assert worker.running
 
@@ -92,15 +92,15 @@ class TestMonitoring:
         time.sleep(2.5)
 
         # Stop monitoring
-        sccpt.stop()
+        cammy.stop()
         assert not worker.running
         assert worker.screenshot_count >= 2
 
     def test_custom_interval(self):
         """Test custom capture interval."""
-        worker = sccpt.start(interval=0.5, verbose=False)
+        worker = cammy.start(interval=0.5, verbose=False)
         time.sleep(5)  # Give more time for captures
-        sccpt.stop()
+        cammy.stop()
 
         # In WSL with PowerShell screenshot capture, each screenshot takes ~1.5s
         # So in 5 seconds, we expect about 3-4 screenshots
@@ -115,7 +115,7 @@ class TestCacheManagement:
         """Test that cache management doesn't crash."""
         # This just tests that the function doesn't error
         # Actually testing file deletion would require creating many large files
-        path = sccpt.cpt("cache test", max_cache_gb=0.001)  # Very small limit
+        path = cammy.snap("cache test", max_cache_gb=0.001)  # Very small limit
         assert path is not None
 
 
@@ -124,13 +124,13 @@ class TestMultiMonitor:
 
     def test_single_monitor(self):
         """Test capturing specific monitor."""
-        path = sccpt.capture("monitor 1", monitor_id=1)
+        path = cammy.capture("monitor 1", monitor_id=1)
         assert path is not None
         assert os.path.exists(path)
 
     def test_all_monitors(self):
         """Test capturing all monitors."""
-        path = sccpt.capture("all monitors", capture_all=True)
+        path = cammy.capture("all monitors", capture_all=True)
         assert path is not None
         assert os.path.exists(path)
 
@@ -140,7 +140,7 @@ class TestFilenameNormalization:
 
     def test_special_characters(self):
         """Test that special characters are normalized."""
-        path = sccpt.cpt("Test with spaces & symbols!@#$%")
+        path = cammy.snap("Test with spaces & symbols!@#$%")
         assert path is not None
         assert "@" not in path
         assert "#" not in path
@@ -150,7 +150,7 @@ class TestFilenameNormalization:
     def test_long_message(self):
         """Test that long messages are truncated."""
         long_msg = "x" * 100
-        path = sccpt.cpt(long_msg)
+        path = cammy.snap(long_msg)
         assert path is not None
         # Message should be truncated to 50 chars
         filename = os.path.basename(path)
@@ -162,14 +162,14 @@ class TestVerbosity:
 
     def test_verbose_false(self, capsys):
         """Test that verbose=False suppresses output."""
-        path = sccpt.capture("quiet test", verbose=False)
+        path = cammy.capture("quiet test", verbose=False)
         captured = capsys.readouterr()
         assert "📸" not in captured.out
         assert path is not None
 
     def test_verbose_true(self, capsys):
         """Test that verbose=True shows output."""
-        path = sccpt.capture("verbose test", verbose=True)
+        path = cammy.capture("verbose test", verbose=True)
         captured = capsys.readouterr()
         assert "📸" in captured.out
         assert path is not None

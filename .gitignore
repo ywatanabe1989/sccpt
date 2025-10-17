@@ -337,7 +337,7 @@ acs-*.bib
 *.cut
 
 # cprotect
-*.cpt
+*.snap
 
 # elsarticle (documentclass of Elsevier journals)
 *.spl

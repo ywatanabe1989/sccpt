@@ -1,5 +1,5 @@
 """
-Pytest configuration for sccpt tests.
+Pytest configuration for cammy tests.
 """
 
 import os
