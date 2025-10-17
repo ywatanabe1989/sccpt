@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Timestamp: "2025-10-17 03:24:58 (ywatanabe)"
-# File: /home/ywatanabe/proj/cam/mcp_server_cam.py
+# File: /home/ywatanabe/proj/cammy/mcp_server_cammy.py
 # ----------------------------------------
 from __future__ import annotations
 import os
 __FILE__ = (
-    "./mcp_server_cam.py"
+    "./mcp_server_cammy.py"
 )
 __DIR__ = os.path.dirname(__FILE__)
 # ----------------------------------------
@@ -26,12 +26,12 @@ from mcp.server import NotificationOptions, Server
 from mcp.server.models import InitializationOptions
 from mcp.server.stdio import stdio_server
 
-import cam
+import cammy
 
 
 class CAMServer:
     def __init__(self):
-        self.server = Server("cam-server")
+        self.server = Server("cammy-server")
         self.monitoring_active = False
         self.monitoring_worker = None
         self.setup_handlers()
@@ -107,7 +107,7 @@ class CAMServer:
                             },
                             "output_dir": {
                                 "type": "string",
-                                "description": "Directory for screenshots (default: ~/.cache/cam)",
+                                "description": "Directory for screenshots (default: ~/.cache/cammy)",
                             },
                             "quality": {
                                 "type": "integer",
@@ -325,7 +325,7 @@ class CAMServer:
         # Provide screenshots as resources
         @self.server.list_resources()
         async def handle_list_resources():
-            cache_dir = Path.home() / ".cache" / "cam"
+            cache_dir = Path.home() / ".cache" / "cammy"
             if not cache_dir.exists():
                 return []
 
@@ -364,7 +364,7 @@ class CAMServer:
         async def handle_read_resource(uri: str):
             if uri.startswith("screenshot://"):
                 filename = uri.replace("screenshot://", "")
-                filepath = Path.home() / ".cache" / "cam" / filename
+                filepath = Path.home() / ".cache" / "cammy" / filename
 
                 if filepath.exists():
                     with open(filepath, "rb") as f:
@@ -388,12 +388,12 @@ class CAMServer:
     ):
         """Capture a screenshot - monitor, window, browser, or everything."""
         try:
-            # Run in thread pool since cam is sync
+            # Run in thread pool since cammy is sync
             loop = asyncio.get_event_loop()
 
-            # Use cam.snap which now handles all, app, url parameters
+            # Use cammy.snap which now handles all, app, url parameters
             def do_capture():
-                return cam.snap(
+                return cammy.snap(
                     message=message,
                     quality=quality,
                     monitor_id=monitor_id,
@@ -449,8 +449,8 @@ class CAMServer:
 
             # Use a lambda to pass the monitor parameters correctly
             def start_with_monitor():
-                return cam.start_monitor(
-                    output_dir=output_dir or "~/.cache/cam/",
+                return cammy.start_monitor(
+                    output_dir=output_dir or "~/.cache/cammy/",
                     interval=interval,
                     jpeg=True,
                     quality=quality,
@@ -470,7 +470,7 @@ class CAMServer:
             return {
                 "success": True,
                 "message": f"Started monitoring with {interval}s interval on monitor {monitor_id}",
-                "output_dir": output_dir or "~/.cache/cam/",
+                "output_dir": output_dir or "~/.cache/cammy/",
                 "interval": interval,
                 "monitor_id": monitor_id,
                 "capture_all": capture_all,
@@ -486,7 +486,7 @@ class CAMServer:
 
         try:
             loop = asyncio.get_event_loop()
-            await loop.run_in_executor(None, cam.stop)
+            await loop.run_in_executor(None, cammy.stop)
 
             # Get stats from worker
             stats = {}
@@ -508,7 +508,7 @@ class CAMServer:
         """Get monitoring status."""
         status = {
             "active": self.monitoring_active,
-            "cache_dir": str(Path.home() / ".cache" / "cam"),
+            "cache_dir": str(Path.home() / ".cache" / "cammy"),
         }
 
         if self.monitoring_active and self.monitoring_worker:
@@ -523,7 +523,7 @@ class CAMServer:
             )
 
         # Get cache size
-        cache_dir = Path.home() / ".cache" / "cam"
+        cache_dir = Path.home() / ".cache" / "cammy"
         if cache_dir.exists():
             total_size = sum(f.stat().st_size for f in cache_dir.glob("*.jpg"))
             status["cache_size_mb"] = round(total_size / (1024 * 1024), 2)
@@ -534,8 +534,8 @@ class CAMServer:
     async def analyze_screenshot(self, path: str):
         """Analyze screenshot for errors/warnings."""
         try:
-            # Use cam's internal detection
-            from cam.utils import _detect_category
+            # Use cammy's internal detection
+            from cammy.utils import _detect_category
 
             loop = asyncio.get_event_loop()
             category = await loop.run_in_executor(None, _detect_category, path)
@@ -561,7 +561,7 @@ class CAMServer:
     async def list_recent_screenshots(self, limit=10, category="all"):
         """List recent screenshots from cache."""
         try:
-            cache_dir = Path.home() / ".cache" / "cam"
+            cache_dir = Path.home() / ".cache" / "cammy"
             if not cache_dir.exists():
                 return {
                     "success": True,
@@ -618,7 +618,7 @@ class CAMServer:
     async def clear_cache(self, max_size_gb=1.0, clear_all=False):
         """Clear or manage cache size."""
         try:
-            cache_dir = Path.home() / ".cache" / "cam"
+            cache_dir = Path.home() / ".cache" / "cammy"
             if not cache_dir.exists():
                 return {
                     "success": True,
@@ -641,8 +641,8 @@ class CAMServer:
                     "removed_count": removed,
                 }
             else:
-                # Use cam's cache management
-                from cam.utils import _manage_cache_size
+                # Use cammy's cache management
+                from cammy.utils import _manage_cache_size
 
                 loop = asyncio.get_event_loop()
                 await loop.run_in_executor(
@@ -675,7 +675,7 @@ class CAMServer:
     ):
         """Create GIF from screenshots."""
         try:
-            from cam.gif import GifCreator
+            from cammy.gif import GifCreator
 
             creator = GifCreator()
             loop = asyncio.get_event_loop()
@@ -687,7 +687,7 @@ class CAMServer:
                     result_path = await loop.run_in_executor(
                         None,
                         creator.create_gif_from_recent_session,
-                        "~/.cache/cam",
+                        "~/.cache/cammy",
                         duration,
                         optimize,
                         max_frames,
@@ -699,7 +699,7 @@ class CAMServer:
                         creator.create_gif_from_session,
                         session_id,
                         output_path,
-                        "~/.cache/cam",
+                        "~/.cache/cammy",
                         duration,
                         optimize,
                         max_frames,
@@ -708,7 +708,7 @@ class CAMServer:
                 # Use specific image paths
                 if not output_path:
                     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                    output_path = f"~/.cache/cam/custom_gif_{timestamp}.gif"
+                    output_path = f"~/.cache/cammy/custom_gif_{timestamp}.gif"
 
                 result_path = await loop.run_in_executor(
                     None,
@@ -765,13 +765,13 @@ class CAMServer:
     async def list_sessions(self, limit=10):
         """List available monitoring sessions."""
         try:
-            from cam.gif import GifCreator
+            from cammy.gif import GifCreator
 
             creator = GifCreator()
             loop = asyncio.get_event_loop()
 
             sessions = await loop.run_in_executor(
-                None, creator.get_recent_sessions, "~/.cache/cam"
+                None, creator.get_recent_sessions, "~/.cache/cammy"
             )
 
             # Limit results
@@ -779,7 +779,7 @@ class CAMServer:
 
             # Get details for each session
             session_details = []
-            cache_dir = Path.home() / ".cache" / "cam"
+            cache_dir = Path.home() / ".cache" / "cammy"
 
             for session_id in sessions:
                 # Count screenshots in session
@@ -828,7 +828,7 @@ class CAMServer:
         """Enumerate all monitors and virtual desktops."""
         try:
             loop = asyncio.get_event_loop()
-            info = await loop.run_in_executor(None, cam.get_info)
+            info = await loop.run_in_executor(None, cammy.get_info)
 
             return {
                 "success": True,
@@ -844,7 +844,7 @@ class CAMServer:
         """List all visible windows."""
         try:
             loop = asyncio.get_event_loop()
-            info = await loop.run_in_executor(None, cam.get_info)
+            info = await loop.run_in_executor(None, cammy.get_info)
 
             windows = info.get("Windows", {})
             window_list = windows.get("Details", [])
@@ -878,7 +878,7 @@ class CAMServer:
         try:
             loop = asyncio.get_event_loop()
             path = await loop.run_in_executor(
-                None, cam.capture_window, window_handle, output_path
+                None, cammy.capture_window, window_handle, output_path
             )
 
             if path:
@@ -905,7 +905,7 @@ async def main():
             read_stream,
             write_stream,
             InitializationOptions(
-                server_name="cam",
+                server_name="cammy",
                 server_version="0.1.0",
                 capabilities=server.server.get_capabilities(
                     notification_options=NotificationOptions(),

@@ -1,7 +1,7 @@
 <!-- ---
-!-- Timestamp: 2025-10-17 03:28:14
+!-- Timestamp: 2025-10-17 03:56:02
 !-- Author: ywatanabe
-!-- File: /home/ywatanabe/proj/cam/README.md
+!-- File: /home/ywatanabe/proj/cammy/README.md
 !-- --- -->
 
 # CAM - Python Screen Capture with MCP Server Support
@@ -26,14 +26,14 @@ A lightweight, efficient screen capture library with automatic error detection. 
 
 ### From PyPI (Recommended)
 ```bash
-pip install cam
-# pip install cam[full] # For full features including mss and Pillow support:
+pip install cammy
+# pip install cammy[full] # For full features including mss and Pillow support:
 ```
 
 ### From Source
 ```bash
-git clone https://github.com/ywatanabe1989/cam.git
-cd cam
+git clone https://github.com/ywatanabe1989/cammy.git
+cd cammy
 
 # Install dependencies
 pip install -r requirements.txt
@@ -44,19 +44,19 @@ pip install -r requirements.txt
 ### 🐍 Python API - Beautiful Simplicity
 
 ```python
-import cam
+import cammy
 
 # Core functions
-cam.snap()                          # Capture single screenshot
-cam.start()                        # Start monitoring
-cam.stop()                         # Stop monitoring
-cam.create_gif_from_latest_session()  # Create GIF summary
+cammy.snap()                          # Capture single screenshot
+cammy.start()                        # Start monitoring
+cammy.stop()                         # Stop monitoring
+cammy.create_gif_from_latest_session()  # Create GIF summary
 
 # Multi-desktop features
-cam.get_info()           # List all monitors and windows
-cam.snap(monitor_id=1)             # Capture specific monitor
-cam.snap(capture_all=True)         # Capture all monitors
-cam.start(monitor_id=0)           # Monitor specific screen
+cammy.get_info()           # List all monitors and windows
+cammy.snap(monitor_id=1)             # Capture specific monitor
+cammy.snap(capture_all=True)         # Capture all monitors
+cammy.start(monitor_id=0)           # Monitor specific screen
 ```
 
 <details>
@@ -65,56 +65,56 @@ cam.start(monitor_id=0)           # Monitor specific screen
 ### 🐛 Debug Your Code Visually
 
 ```python
-import cam
+import cammy
 
 def process_data(df):
-    cam.snap("before transformation")
+    cammy.snap("before transformation")
     df = df.transform(complex_operation)
-    cam.snap("after transformation")
+    cammy.snap("after transformation")
     return df
 ```
 
 ### 🚨 Automatic Error Screenshots
 
 ```python
-import cam
+import cammy
 
 try:
     selenium_driver.click(button)
     api_response = fetch_data()
 except Exception as e:
-    cam.snap()  # Auto-adds -stderr suffix
+    cammy.snap()  # Auto-adds -stderr suffix
     raise
 ```
 
 ### 🔍 Monitor Long-Running Processes
 
 ```python
-import cam
+import cammy
 
-cam.start()  # Start taking screenshots every second
+cammy.start()  # Start taking screenshots every second
 train_model()  # Your long operation
-cam.stop()
+cammy.stop()
 
 # Multi-monitor monitoring
-cam.start(capture_all=True, interval=2.0)  # All monitors, 2s interval
+cammy.start(capture_all=True, interval=2.0)  # All monitors, 2s interval
 ```
 
 ### 🎬 Create GIF Summaries
 
 ```python
-import cam
+import cammy
 
 # Method 1: Use Context Manager
-with cam.session() as session:
+with cammy.session() as session:
     # ... your process ...
 
 # Method 2: Start/Stop Manually
-cam.start()
+cammy.start()
 # ... your process ...  
-cam.stop()
-cam.create_gif_from_latest_session()
-# 📹 GIF created: ~/.cache/cam/20250823_104523_summary.gif
+cammy.stop()
+cammy.create_gif_from_latest_session()
+# 📹 GIF created: ~/.cache/cammy/20250823_104523_summary.gif
 ```
 
 ## Configuration
@@ -122,7 +122,7 @@ cam.create_gif_from_latest_session()
 All configuration through function parameters - no config files needed!
 
 ```python
-cam.start(
+cammy.start(
     output_dir="~/screenshots",  # Where to save
     interval=2.0,                # Seconds between captures
     quality=85,                  # JPEG quality (1-100)
@@ -135,35 +135,35 @@ cam.start(
 ### 🖥️ Multi-Desktop & Monitor Features
 
 ```python
-import cam
+import cammy
 
 # Enumerate available monitors and windows
-info = cam.get_info()
+info = cammy.get_info()
 print(f"Monitors: {info['Monitors']['Count']}")
 print(f"Windows: {info['Windows']['VisibleCount']}")
 
 # Capture specific monitor
-cam.snap(monitor_id=0)    # Primary monitor
-cam.snap(monitor_id=1)    # Secondary monitor
+cammy.snap(monitor_id=0)    # Primary monitor
+cammy.snap(monitor_id=1)    # Secondary monitor
 
 # Capture all monitors combined
-cam.snap(capture_all=True)
+cammy.snap(capture_all=True)
 
 # Capture specific window by handle
 windows = info['Windows']['Details']
 if windows:
     handle = windows[0]['Handle']
-    path = cam.capture_window(handle)
+    path = cammy.capture_window(handle)
     print(f"Captured window: {path}")
 
 # Monitor specific screen continuously
-cam.start(monitor_id=1, interval=3.0)
+cammy.start(monitor_id=1, interval=3.0)
 ```
 
 ## File Structure
 
 ```
-~/.cache/cam/
+~/.cache/cammy/
 ├── 20250823_104523-message-stdout.jpg    # Normal capture
 ├── 20250823_104525-error-stderr.jpg      # Error capture  
 └── 20250823_104530_0001_*.jpg            # Monitoring mode
@@ -197,9 +197,9 @@ Optional:
  !-- // Add to your Claude Code settings
  !-- {
  !--   "mcpServers": {
- !--     "cam": {
+ !--     "cammy": {
  !--       "command": "python", 
- !--       "args": ["/path/to/cam/mcp_server_cam.py"]
+ !--       "args": ["/path/to/cammy/mcp_server_cammy.py"]
  !--     }
  !--   }
  !-- }
@@ -208,9 +208,9 @@ Optional:
 // Add to your Claude Code settings
 {
   "mcpServers": {
-    "cam": {
+    "cammy": {
       "command": "python", 
-      "args": ["-m", "cam", "--mcp"]
+      "args": ["-m", "cammy", "--mcp"]
     }
   }
 }

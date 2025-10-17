@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Timestamp: "2025-08-25 13:56:53 (ywatanabe)"
-# File: /home/ywatanabe/proj/cam/src/cam/session.py
+# File: /home/ywatanabe/proj/cammy/src/cammy/session.py
 # ----------------------------------------
 from __future__ import annotations
 import os
 __FILE__ = (
-    "./src/cam/session.py"
+    "./src/cammy/session.py"
 )
 __DIR__ = os.path.dirname(__FILE__)
 # ----------------------------------------
@@ -15,7 +15,7 @@ class Session:
 
     def __init__(
         self,
-        output_dir: str = "~/.cache/cam/",
+        output_dir: str = "~/.cache/cammy/",
         interval: float = 1.0,
         jpeg: bool = True,
         quality: int = 60,

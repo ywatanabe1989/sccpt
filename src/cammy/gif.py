@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Timestamp: "2025-10-17 03:20:05 (ywatanabe)"
-# File: /home/ywatanabe/proj/cam/src/cam/gif.py
+# File: /home/ywatanabe/proj/cammy/src/cammy/gif.py
 # ----------------------------------------
 from __future__ import annotations
 import os
 __FILE__ = (
-    "./src/cam/gif.py"
+    "./src/cammy/gif.py"
 )
 __DIR__ = os.path.dirname(__FILE__)
 # ----------------------------------------
@@ -36,7 +36,7 @@ class GifCreator:
         self,
         session_id: str,
         output_path: Optional[str] = None,
-        screenshot_dir: str = "~/.cache/cam",
+        screenshot_dir: str = "~/.cache/cammy",
         duration: float = 0.5,
         optimize: bool = True,
         max_frames: Optional[int] = None,
@@ -241,7 +241,7 @@ class GifCreator:
             return None
 
     def get_recent_sessions(
-        self, screenshot_dir: str = "~/.cache/cam"
+        self, screenshot_dir: str = "~/.cache/cammy"
     ) -> List[str]:
         """
         Get list of recent monitoring session IDs.
@@ -279,7 +279,7 @@ class GifCreator:
 
     def create_gif_from_recent_session(
         self,
-        screenshot_dir: str = "~/.cache/cam",
+        screenshot_dir: str = "~/.cache/cammy",
         duration: float = 0.5,
         optimize: bool = True,
         max_frames: Optional[int] = None,

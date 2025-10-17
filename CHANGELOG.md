@@ -21,7 +21,7 @@ All notable changes to this project will be documented in this file.
 ## [0.2.0] - 2025-10-17
 
 ### Added
-- Renamed project from `screenshot-capture` to `cam`
+- Renamed project from `screenshot-capture` to `cammy`
 - Multi-desktop support for capturing all monitors
 - Enhanced MCP server with comprehensive screenshot tools
 - URL capture via browser (Playwright)

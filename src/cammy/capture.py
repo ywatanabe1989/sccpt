@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Timestamp: "2025-10-17 03:19:45 (ywatanabe)"
-# File: /home/ywatanabe/proj/cam/src/cam/capture.py
+# File: /home/ywatanabe/proj/cammy/src/cammy/capture.py
 # ----------------------------------------
 from __future__ import annotations
 import os
 __FILE__ = (
-    "./src/cam/capture.py"
+    "./src/cammy/capture.py"
 )
 __DIR__ = os.path.dirname(__FILE__)
 # ----------------------------------------
@@ -32,7 +32,7 @@ class ScreenshotWorker:
 
     def __init__(
         self,
-        output_dir: str = "/tmp/cam_screenshots",
+        output_dir: str = "/tmp/cammy_screenshots",
         interval_sec: float = 1.0,
         verbose: bool = False,
         use_jpeg: bool = True,
@@ -562,7 +562,7 @@ class CaptureManager:
 
     def start_capture(
         self,
-        output_dir: str = "/tmp/cam_screenshots",
+        output_dir: str = "/tmp/cammy_screenshots",
         interval: float = 1.0,
         jpeg: bool = True,
         quality: int = 60,

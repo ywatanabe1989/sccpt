@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Timestamp: "2025-10-17 03:20:22 (ywatanabe)"
-# File: /home/ywatanabe/proj/cam/src/cam/utils.py
+# File: /home/ywatanabe/proj/cammy/src/cammy/utils.py
 # ----------------------------------------
 from __future__ import annotations
 import os
 __FILE__ = (
-    "./src/cam/utils.py"
+    "./src/cammy/utils.py"
 )
 __DIR__ = os.path.dirname(__FILE__)
 # ----------------------------------------
@@ -104,7 +104,7 @@ def capture(
     message : str, optional
         Message to include in filename
     path : str, optional
-        Output path (default: ~/.cache/cam/)
+        Output path (default: ~/.cache/cammy/)
     quality : int
         JPEG quality (1-100)
     all : bool
@@ -129,12 +129,12 @@ def capture(
 
     Examples
     --------
-    >>> import cam
+    >>> import cammy
     >>>
-    >>> cam.snap()                           # Current monitor
-    >>> cam.snap(all=True)                   # All monitors
-    >>> cam.snap(app="chrome")               # Chrome window
-    >>> cam.snap(url="http://localhost:8000") # Browser page
+    >>> cammy.snap()                           # Current monitor
+    >>> cammy.snap(all=True)                   # All monitors
+    >>> cammy.snap(app="chrome")               # Chrome window
+    >>> cammy.snap(url="http://localhost:8000") # Browser page
     """
     # Handle URL capture
     if url:
@@ -153,7 +153,7 @@ def capture(
                     .replace("/", "_")
                     .replace(":", "_")[:30]
                 )
-                path = f"~/.cache/cam/{timestamp_str}-url-{url_slug}.jpg"
+                path = f"~/.cache/cammy/{timestamp_str}-url-{url_slug}.jpg"
 
             path = os.path.expanduser(path)
 
@@ -203,7 +203,7 @@ def capture(
 
         except ImportError:
             if verbose:
-                print("⚠️  Playwright not installed: pip install cam[browser]")
+                print("⚠️  Playwright not installed: pip install cammy[browser]")
             pass  # Try PowerShell fallback
         except Exception as e:
             if verbose:
@@ -228,7 +228,7 @@ def capture(
                         .replace("/", "_")
                         .replace(":", "_")[:30]
                     )
-                    path = f"~/.cache/cam/{timestamp_str}-url-{url_slug}.jpg"
+                    path = f"~/.cache/cammy/{timestamp_str}-url-{url_slug}.jpg"
 
                 path = os.path.expanduser(path)
 
@@ -378,7 +378,7 @@ def capture(
 
     # Take screenshot first to analyze it
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
-    temp_dir = "/tmp/cam_temp"
+    temp_dir = "/tmp/cammy_temp"
     Path(temp_dir).mkdir(exist_ok=True)
 
     # Take screenshot to temp location
@@ -449,7 +449,7 @@ def capture(
     # Handle path with category and message
     if path is None:
         # Include monitor/scope info in filename
-        path = f"~/.cache/cam/<timestamp><scope><message><category_suffix>.jpg"
+        path = f"~/.cache/cammy/<timestamp><scope><message><category_suffix>.jpg"
 
     # Expand user home
     path = os.path.expanduser(path)
@@ -482,7 +482,7 @@ def capture(
         _add_message_metadata(str(final_path), metadata)
 
     # Manage cache size (remove old files if needed)
-    cache_dir = Path(os.path.expanduser("~/.cache/cam"))
+    cache_dir = Path(os.path.expanduser("~/.cache/cammy"))
     if cache_dir.exists():
         _manage_cache_size(cache_dir, max_cache_gb)
 
@@ -525,7 +525,7 @@ def take_screenshot(
 
 
 def start_monitor(
-    output_dir: str = "~/.cache/cam/",
+    output_dir: str = "~/.cache/cammy/",
     interval: float = 1.0,
     jpeg: bool = True,
     quality: int = 60,
@@ -541,7 +541,7 @@ def start_monitor(
     Parameters
     ----------
     output_dir : str
-        Directory for screenshots (default: ~/.cache/cam/)
+        Directory for screenshots (default: ~/.cache/cammy/)
     interval : float
         Seconds between captures
     jpeg : bool
@@ -567,10 +567,10 @@ def start_monitor(
     Examples
     --------
     >>> # Simple monitoring
-    >>> cam.start()
+    >>> cammy.start()
 
     >>> # With event hooks
-    >>> cam.start(
+    >>> cammy.start(
     ...     on_capture=lambda path: print(f"Saved: {path}"),
     ...     on_error=lambda e: logging.error(e)
     ... )
@@ -579,7 +579,7 @@ def start_monitor(
     >>> def check_error_dialog(path):
     ...     if "error" in analyze_image(path):
     ...         send_alert(f"Error detected: {path}")
-    >>> cam.start(on_capture=check_error_dialog)
+    >>> cammy.start(on_capture=check_error_dialog)
     """
     # Expand user home directory
     output_dir = os.path.expanduser(output_dir)

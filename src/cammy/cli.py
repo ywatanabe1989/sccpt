@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Timestamp: "2025-10-17 03:19:30 (ywatanabe)"
-# File: /home/ywatanabe/proj/cam/src/cam/cli.py
+# File: /home/ywatanabe/proj/cammy/src/cammy/cli.py
 # ----------------------------------------
 from __future__ import annotations
 import os
 __FILE__ = (
-    "./src/cam/cli.py"
+    "./src/cammy/cli.py"
 )
 __DIR__ = os.path.dirname(__FILE__)
 # ----------------------------------------
 """
-CLI for cam - AI's Camera
+CLI for cammy - AI's Camera
 """
 
 import argparse
@@ -21,21 +21,21 @@ import sys
 def main():
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(
-        description="cam - AI's Camera: Capture screenshots from anywhere",
+        description="cammy - AI's Camera: Capture screenshots from anywhere",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python -m cam                        # Capture current screen
-  python -m cam --all                  # Capture all monitors
-  python -m cam --app chrome           # Capture Chrome window
-  python -m cam --url 127.0.0.1:8000   # Capture URL
-  python -m cam --monitor 1            # Capture monitor 1
-  python -m cam --list                 # List available windows
+  python -m cammy                        # Capture current screen
+  python -m cammy --all                  # Capture all monitors
+  python -m cammy --app chrome           # Capture Chrome window
+  python -m cammy --url 127.0.0.1:8000   # Capture URL
+  python -m cammy --monitor 1            # Capture monitor 1
+  python -m cammy --list                 # List available windows
 
-  python -m cam --start                # Start monitoring
-  python -m cam --stop                 # Stop monitoring
-  python -m cam --gif                  # Create GIF from session
-  python -m cam --mcp                  # Start MCP server
+  python -m cammy --start                # Start monitoring
+  python -m cammy --stop                 # Stop monitoring
+  python -m cammy --gif                  # Create GIF from session
+  python -m cammy --mcp                  # Start MCP server
         """,
     )
 
@@ -89,15 +89,15 @@ Examples:
 
     args = parser.parse_args()
 
-    # Import cam after parsing to avoid import overhead for --help
-    import cam
+    # Import cammy after parsing to avoid import overhead for --help
+    import cammy
 
     verbose = not args.quiet
 
     try:
         # Handle actions
         if args.list:
-            info = cam.get_info()
+            info = cammy.get_info()
             windows = info.get("Windows", {}).get("Details", [])
             print(f"\n📱 Visible Windows ({len(windows)}):")
             print("=" * 60)
@@ -107,7 +107,7 @@ Examples:
             return 0
 
         elif args.info:
-            info = cam.get_info()
+            info = cammy.get_info()
             monitors = info.get("Monitors", {})
             windows = info.get("Windows", {})
             vd = info.get("VirtualDesktops", {})
@@ -139,16 +139,16 @@ Examples:
 
         elif args.start:
             print(f"📸 Starting monitoring (interval: {args.interval}s)...")
-            cam.start(
+            cammy.start(
                 interval=args.interval,
                 verbose=verbose,
                 monitor_id=args.monitor,
                 all=args.all,
             )
             print(
-                "✅ Monitoring started. Press Ctrl+C to stop, or run: python -m cam --stop"
+                "✅ Monitoring started. Press Ctrl+C to stop, or run: python -m cammy --stop"
             )
-            print(f"📁 Saving to: ~/.cache/cam/")
+            print(f"📁 Saving to: ~/.cache/cammy/")
 
             # Keep running
             try:
@@ -157,19 +157,19 @@ Examples:
                 while True:
                     time.sleep(1)
             except KeyboardInterrupt:
-                cam.stop()
+                cammy.stop()
                 print("\n✅ Monitoring stopped")
 
             return 0
 
         elif args.stop:
-            cam.stop()
+            cammy.stop()
             print("✅ Monitoring stopped")
             return 0
 
         elif args.gif:
             print("📹 Creating GIF from latest session...")
-            path = cam.gif()
+            path = cammy.gif()
             if path:
                 print(f"✅ GIF created: {path}")
                 return 0
@@ -178,13 +178,13 @@ Examples:
                 return 1
 
         elif args.mcp:
-            print("🤖 Starting cam MCP server...")
+            print("🤖 Starting cammy MCP server...")
             print("Add to Claude Code settings:")
             print("{")
             print('  "mcpServers": {')
-            print('    "cam": {')
+            print('    "cammy": {')
             print('      "command": "python",')
-            print('      "args": ["-m", "cam", "--mcp"]')
+            print('      "args": ["-m", "cammy", "--mcp"]')
             print("    }")
             print("  }")
             print("}")
@@ -195,19 +195,19 @@ Examples:
             from pathlib import Path
 
             mcp_server_path = (
-                Path(__file__).parent.parent.parent / "mcp_server_cam.py"
+                Path(__file__).parent.parent.parent / "mcp_server_cammy.py"
             )
 
             # Import and run MCP server
             sys.path.insert(0, str(mcp_server_path.parent))
-            import mcp_server_cam
+            import mcp_server_cammy
 
-            asyncio.run(mcp_server_cam.main())
+            asyncio.run(mcp_server_cammy.main())
             return 0
 
         # Default: capture screenshot
         else:
-            path = cam.snap(
+            path = cammy.snap(
                 message=args.message,
                 path=args.output,
                 quality=args.quality,

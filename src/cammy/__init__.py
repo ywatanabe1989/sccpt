@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-cam - AI's Camera
+cammy - AI's Camera
 A lightweight, intuitive screen capture library optimized for WSL and Windows.
 
 Features:
@@ -13,18 +13,18 @@ Features:
 - Thread-safe operation
 
 Usage:
-    import cam
+    import cammy
 
     # Single screenshot
-    cam.snap("debug message")
+    cammy.snap("debug message")
 
     # Multi-monitor
-    cam.snap(capture_all=True)
+    cammy.snap(capture_all=True)
 
     # Continuous monitoring
-    cam.start()
+    cammy.start()
     # ... do work ...
-    cam.stop()
+    cammy.stop()
 """
 
 from .utils import (
@@ -65,17 +65,17 @@ def capture_window(window_handle: int, output_path: str = None):
         Path to saved screenshot
 
     Examples:
-        >>> import cam
-        >>> info = cam.get_info()
+        >>> import cammy
+        >>> info = cammy.get_info()
         >>> windows = info['Windows']['Details']
         >>> if windows:
         >>>     handle = windows[0]['Handle']
-        >>>     path = cam.capture_window(handle)
+        >>>     path = cammy.capture_window(handle)
     """
     return _manager.capture_window(window_handle, output_path)
 
 # Convenience aliases - these are the main public API
-snap = capture     # Primary: natural camera action
+snap = capture     # Primary: natural cammyera action
 take = capture     # Alternative: "take a picture"
 cpt = capture      # Legacy: backwards compatibility
 start = start_monitor

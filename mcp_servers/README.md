@@ -61,7 +61,7 @@ Configure the server in your MCP client (e.g., Claude Desktop) by adding to the 
 ```json
 {
   "mcpServers": {
-    "cam": {
+    "cammy": {
       "command": "fastmcp",
       "args": ["run", "/path/to/mcp_servers/mcp_server_fastmcp.py"]
     }

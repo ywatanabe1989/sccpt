@@ -1,1 +1,1 @@
-"""Tests for cam package."""
+"""Tests for cammy package."""
